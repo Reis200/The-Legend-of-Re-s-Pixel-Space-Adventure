@@ -18,8 +18,14 @@ class Main:
         self.clock = pygame.time.Clock()
 
         # Sprite Groups
-        self.player_assets = pygame.sprite.Group()
-        self.player_assets.add(PlayerShip())
+        self.player_sprite_group = pygame.sprite.Group()
+        self.player = PlayerShip()
+        self.player_sprite_group.add(self.player)
+
+
+        # Timer
+        # self.player_shoot_timer = pygame.USEREVENT + 1
+        # pygame.time.set_timer(self.player_shoot_timer, 100)
 
 
     def pygame_loop(self):
@@ -31,11 +37,15 @@ class Main:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     exit()
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                    self.player_sprite_group.add(PlayerBullets(self.player))
+
+
 
             # draw and update player sprite
-            self.player_assets.draw(self.screen)
-            self.player_assets.update()
-
+            self.player_sprite_group.draw(self.screen)
+            self.player_sprite_group.update()
+            print(self.player_sprite_group)
             pygame.display.update()
             self.clock.tick(60)
 
