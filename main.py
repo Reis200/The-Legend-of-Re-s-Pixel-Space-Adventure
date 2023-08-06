@@ -17,15 +17,20 @@ class Main:
         # clock
         self.clock = pygame.time.Clock()
 
-        # Sprite Groups
-        self.player_sprite_group = pygame.sprite.Group()
+        # Sprite Groups - Player
+        self.player_sprite_group = pygame.sprite.GroupSingle()
         self.player = PlayerShip()
         self.player_sprite_group.add(self.player)
 
+        self.player_assets_group = pygame.sprite.Group()
+
+        # Sprite Groups - Enemy
+        self.enemy_sprite_group = pygame.sprite.Group()
+
 
         # Timer
-        # self.player_shoot_timer = pygame.USEREVENT + 1
-        # pygame.time.set_timer(self.player_shoot_timer, 100)
+        self.enemy_spawn_timer = pygame.USEREVENT + 1
+        pygame.time.set_timer(self.enemy_spawn_timer, 1000)
 
 
     def pygame_loop(self):
@@ -38,14 +43,31 @@ class Main:
                     pygame.quit()
                     exit()
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                    self.player_sprite_group.add(PlayerBullets(self.player))
+                    self.player_assets_group.add(PlayerBullets(self.player))
+                if event.type == self.enemy_spawn_timer:
+                    self.enemy_sprite_group.add(EnemyShip(1))
+
 
 
 
             # draw and update player sprite
             self.player_sprite_group.draw(self.screen)
             self.player_sprite_group.update()
-            print(self.player_sprite_group)
+
+            # draw and update player bullets
+            self.player_assets_group.draw(self.screen)
+            self.player_assets_group.update()
+
+            # draw and update enemies
+            self.enemy_sprite_group.draw(self.screen)
+            self.enemy_sprite_group.update()
+
+            # player bullets and enemy collision
+            pygame.sprite.groupcollide(self.player_assets_group,self.enemy_sprite_group, True, True)
+
+            # enemy and player collision
+            if pygame.sprite.spritecollide(self.player_sprite_group.sprite,self.enemy_sprite_group,True): exit();player_sprite_group.sprite.kill()
+
             pygame.display.update()
             self.clock.tick(60)
 
