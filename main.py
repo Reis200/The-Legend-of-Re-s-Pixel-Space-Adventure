@@ -1,6 +1,7 @@
 import pygame
 from sys import exit
 from game_sprites import *
+from random import choice,randint
 
 
 class Main:
@@ -11,8 +12,22 @@ class Main:
         # game window
         self.screen = pygame.display.set_mode((600, 600))
         pygame.display.set_caption("The-Legend-of-Reis-Pixel-Space-Adventure")
-        icon = pygame.image.load("Youtube Icons1.png")
+        icon = pygame.image.load("Youtube Icons1.png").convert_alpha()
         pygame.display.set_icon(icon)
+
+
+        # Game images
+        self.blue_planet = pygame.transform.rotozoom(pygame.image.load("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/blue_planet.png").convert_alpha(), 0 , 2)
+        self.blue_saturn = pygame.transform.rotozoom(pygame.image.load("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/blue_saturn.png").convert_alpha(), 0 , 2)
+        self.died_star = pygame.transform.rotozoom(pygame.image.load("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/died_star.png").convert_alpha(), 0 , 2)
+        self.moon = pygame.transform.rotozoom(pygame.image.load("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/moon.png").convert_alpha(), 0 , 2)
+        self.small_planet_blue = pygame.transform.rotozoom(pygame.image.load("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/small_planet_blue.png").convert_alpha(), 0 , 2)
+        self.small_planet_red = pygame.transform.rotozoom(pygame.image.load("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/small_planet_red.png").convert_alpha(), 0 , 2)
+
+        # Game_states
+        self.start_menu = True
+        self.in_game = False
+        self.in_menu = False
 
         # clock
         self.clock = pygame.time.Clock()
@@ -32,11 +47,34 @@ class Main:
         self.enemy_spawn_timer = pygame.USEREVENT + 1
         pygame.time.set_timer(self.enemy_spawn_timer, 1000)
 
+    def draw_game_background(self):
+        self.screen.fill((28, 41, 81))
+        self.screen.blit(self.blue_planet,(0,0))
+        self.screen.blit(self.blue_saturn,(150,0))
+        self.screen.blit(self.died_star,(250,300))
+        self.screen.blit(self.moon,(100,400))
+        self.screen.blit(self.small_planet_blue,(500,440))
+        self.screen.blit(self.small_planet_red,(300,150))
+        self.screen.blit(self.blue_saturn, (350, 50))
+        self.screen.blit(self.small_planet_blue, (200,  440))
+
+
+
+    def start_menu_operation(self):
+        pass
+
+    def in_game_operation(self):
+        pass
+
+    def in_menu_operation(self):
+        pass
+
+
 
     def pygame_loop(self):
         while True:
 
-            self.screen.fill("#1d1135")
+            self.draw_game_background()
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
