@@ -10,19 +10,19 @@ class Main:
         pygame.init()
 
         # game window
-        self.screen = pygame.display.set_mode((600, 600))
+        self.screen = pygame.display.set_mode((800, 1000))
         pygame.display.set_caption("The-Legend-of-Reis-Pixel-Space-Adventure")
         icon = pygame.image.load("Youtube Icons1.png").convert_alpha()
         pygame.display.set_icon(icon)
 
 
         # Game images
-        self.blue_planet = pygame.transform.rotozoom(pygame.image.load("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/blue_planet.png").convert_alpha(), 0 , 2)
-        self.blue_saturn = pygame.transform.rotozoom(pygame.image.load("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/blue_saturn.png").convert_alpha(), 0 , 2)
-        self.died_star = pygame.transform.rotozoom(pygame.image.load("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/died_star.png").convert_alpha(), 0 , 2)
-        self.moon = pygame.transform.rotozoom(pygame.image.load("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/moon.png").convert_alpha(), 0 , 2)
-        self.small_planet_blue = pygame.transform.rotozoom(pygame.image.load("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/small_planet_blue.png").convert_alpha(), 0 , 2)
-        self.small_planet_red = pygame.transform.rotozoom(pygame.image.load("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/small_planet_red.png").convert_alpha(), 0 , 2)
+        self.bg1 = pygame.transform.rotozoom(pygame.image.load("desolate_places/Cloudy Mountains.png").convert_alpha(), 0 , 3)
+        self.bg2 = pygame.transform.rotozoom(pygame.image.load("desolate_places/Dusty Moon.png").convert_alpha(), 0 , 3)
+        self.bg3 = pygame.transform.rotozoom(pygame.image.load("desolate_places/Glowing Sea.png").convert_alpha(), 0 , 3)
+        self.bg4 = pygame.transform.rotozoom(pygame.image.load("desolate_places/Hidden Desert.png").convert_alpha(), 0 , 3)
+        self.bg5 = pygame.transform.rotozoom(pygame.image.load("desolate_places/Misty Rocks.png").convert_alpha(), 0 , 3)
+        self.bg6 = pygame.transform.rotozoom(pygame.image.load("desolate_places/Starry Peaks.png").convert_alpha(), 0 , 3)
 
         # Game_states
         self.start_menu = True
@@ -31,6 +31,9 @@ class Main:
 
         # clock
         self.clock = pygame.time.Clock()
+
+        # Objects
+        self.lvl_manager = LvlManager()
 
         # Sprite Groups - Player
         self.player_sprite_group = pygame.sprite.GroupSingle()
@@ -49,14 +52,7 @@ class Main:
 
     def draw_game_background(self):
         self.screen.fill((28, 41, 81))
-        self.screen.blit(self.blue_planet,(0,0))
-        self.screen.blit(self.blue_saturn,(150,0))
-        self.screen.blit(self.died_star,(250,300))
-        self.screen.blit(self.moon,(100,400))
-        self.screen.blit(self.small_planet_blue,(500,440))
-        self.screen.blit(self.small_planet_red,(300,150))
-        self.screen.blit(self.blue_saturn, (350, 50))
-        self.screen.blit(self.small_planet_blue, (200,  440))
+        self.screen.blit(self.bg1,(0,0))
 
 
 
@@ -102,6 +98,7 @@ class Main:
 
             # player bullets and enemy collision
             pygame.sprite.groupcollide(self.player_assets_group,self.enemy_sprite_group, True, True)
+
 
             # enemy and player collision
             if pygame.sprite.spritecollide(self.player_sprite_group.sprite,self.enemy_sprite_group,True): exit();player_sprite_group.sprite.kill()

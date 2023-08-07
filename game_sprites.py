@@ -4,15 +4,13 @@ from random import randint
 
 class PlayerShip(pygame.sprite.Sprite):
 
-
-
     def __init__(self):
         super().__init__()
 
         self.bullet_lvl = 0
         self.speed = 5
-        self.image = pygame.image.load("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/copper_space_fighter.png").convert_alpha()
-        self.rect = self.image.get_rect(center = (300,500))
+        self.image = pygame.transform.rotozoom(pygame.image.load("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/copper_space_fighter.png").convert_alpha(),0,2)
+        self.rect = self.image.get_rect(center = (400,900))
 
     def player_movement(self):
         keys = pygame.key.get_pressed()
@@ -29,14 +27,13 @@ class PlayerShip(pygame.sprite.Sprite):
         self.player_movement()
 
 
-
 class PlayerBullets(pygame.sprite.Sprite):
 
     def __init__(self, player):
         super().__init__()
 
-        self.bullet_1 = pygame.transform.rotozoom(pygame.image.load("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/character_bullet_2.png").convert_alpha(),0,2)
-        self.bullet_2 = pygame.transform.rotozoom(pygame.image.load("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/character_bullet_1.png").convert_alpha(),0,2)
+        self.bullet_1 = pygame.transform.rotozoom(pygame.image.load("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/character_bullet_2.png").convert_alpha(),0,4)
+        self.bullet_2 = pygame.transform.rotozoom(pygame.image.load("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/character_bullet_1.png").convert_alpha(),0,4)
         self.bullets_list = [self.bullet_1, self.bullet_2]
         self.bullet_index = player.bullet_lvl
         self.bullet_image = self.bullets_list[self.bullet_index]
@@ -52,7 +49,6 @@ class PlayerBullets(pygame.sprite.Sprite):
         self.shoot()
 
 
-
 class EnemyShip(pygame.sprite.Sprite):
 
     enemies_dict = {1:"The-Legend-of-Reis-Pixel-Space-Adventure-Assets/enemy_ship_1.png",
@@ -61,14 +57,14 @@ class EnemyShip(pygame.sprite.Sprite):
                     4:"The-Legend-of-Reis-Pixel-Space-Adventure-Assets/enemy_small_boat.png",
                     5:"The-Legend-of-Reis-Pixel-Space-Adventure-Assets/enemy_small_boat_bomb.png",
                     6:"The-Legend-of-Reis-Pixel-Space-Adventure-Assets/enemy_small_boat_triplegun.png",
-                    7:"The-Legend-of-Reis-Pixel-Space-Adventure-Assets/Pixel space ships boss"}
+                    7:"The-Legend-of-Reis-Pixel-Space-Adventure-Assets/Pixel space ships boss.png"}
 
     def __init__(self, enemy_id):
         super().__init__()
 
         # enemy_id in from 1 - 7
-        self.image = pygame.transform.rotozoom(pygame.image.load(self.enemies_dict[enemy_id]),0,2)
-        self.rect = self.image.get_rect(center = (randint(80,550),randint(-300,-50)))
+        self.image = pygame.transform.rotozoom(pygame.image.load(self.enemies_dict[enemy_id]),0,3)
+        self.rect = self.image.get_rect(center = (randint(80,750),randint(-300,-50)))
 
         match enemy_id:
             case 1: self.speed = 3
@@ -90,7 +86,7 @@ class EnemyShip(pygame.sprite.Sprite):
         if self.rect.left > 0: self.rect.x -= self.speed
 
     def destroy(self):
-        if self.rect.y >= 675:
+        if self.rect.y >= 1075:
             self.kill()
 
     def update(self):
@@ -98,5 +94,4 @@ class EnemyShip(pygame.sprite.Sprite):
         # self.move_right()
         # self.move_left()
         self.destroy()
-
 
