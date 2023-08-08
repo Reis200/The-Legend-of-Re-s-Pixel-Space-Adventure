@@ -13,9 +13,9 @@ class PlayerShip(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center = (400,900))
 
         # health for player
-        self.current_health = 100
-        self.target_health = 200
-        self.max_health = 200
+        self.current_health = 400
+        self.target_health = 400
+        self.max_health = 400
         self.health_bar_length = 100
         self.health_ratio = self.max_health / self.health_bar_length
         self.health_change_speed = 0.8
@@ -105,6 +105,7 @@ class PlayerBullets(pygame.sprite.Sprite):
 class EnemyBullets(pygame.sprite.Sprite):
     def __init__(self,enemy):
         super().__init__()
+        self.host_enemy = enemy
         self.bullet_1 = pygame.transform.rotozoom(pygame.image.load("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/enemy_bullet_2.png").convert_alpha(), 0, 4)
         self.bullet_2 = pygame.transform.rotozoom(pygame.image.load("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/enemy_bullet_1.png").convert_alpha(), 0, 4)
         self.bullets_list = [self.bullet_1, self.bullet_2]
@@ -137,6 +138,13 @@ class EnemyShip(pygame.sprite.Sprite):
         if enemy_id <= 3: self.bullet_lvl = 0
         else: self.bullet_lvl = 1
 
+        self.enemy_cycle_y = True
+        self.enemy_cycle_x1 = False
+        self.enemy_cycle_x2 = False
+
+        self.enemy_check_points = [100,200,300,400,500,600,700,800]
+        self.enemy_check_point_index = 0
+
         # enemy_id in from 1 - 7
         self.image = pygame.transform.rotozoom(pygame.image.load(self.enemies_dict[enemy_id]),0,3)
         self.rect = self.image.get_rect(center = (randint(80,750),randint(-300,-50)))
@@ -150,23 +158,83 @@ class EnemyShip(pygame.sprite.Sprite):
             case 6: self.speed = 4
             case 7: self.speed = 1
 
+        # health for enemy
+        self.current_health = 100
+        self.target_health = 100
+        self.max_health = 100
+        self.health_bar_length = 75
+        self.health_ratio = self.max_health / self.health_bar_length
+        self.health_change_speed = 5
+        self.health_bar_color = (255, 0, 0)
+
+    def increase_health(self, amount):
+        if self.target_health < self.max_health:
+            self.target_health += amount
+        if self.target_health >= self.max_health:
+            self.target_health = self.max_health
+
+    def decrease_health(self, amount):
+        if self.target_health > 0:
+            self.target_health -= amount
+        if self.target_health <= 0:
+            self.target_health = 0
+
+    def draw_health(self,screen):
+        transition_width = 0
+        transition_color = self.health_bar_color
+
+        if self.current_health < self.target_health:
+            self.current_health += self.health_change_speed
+            transition_width = int((self.target_health - self.current_health) / self.health_ratio)
+            transition_color = (0,255,0)
+        if self.current_health > self.target_health:
+            self.current_health -= self.health_change_speed
+            transition_width = int((self.current_health - self.target_health) / self.health_ratio)
+            transition_color = (255,255,0)
+
+        health_bar_rect = pygame.Rect(self.rect.left,self.rect.top - 10,int(self.current_health / self.health_ratio),10)
+        transition_bar_rect = pygame.Rect(health_bar_rect.right,self.rect.top - 10,transition_width,10)
+
+        pygame.draw.rect(screen, self.health_bar_color, health_bar_rect)
+        if self.current_health != 100: pygame.draw.rect(screen, transition_color, transition_bar_rect)
+        pygame.draw.rect(screen, (255, 255, 255), (self.rect.left,self.rect.top - 10,self.health_bar_length,10), 4)
+
+    def is_died(self):
+        if self.current_health <= 0:
+            self.kill()
+
+
     def move_vertical(self):
-        # if randint(0,2):
         self.rect.y += self.speed
 
     def move_right(self):
-        if self.rect.right < 600: self.rect.x += self.speed
+        self.rect.x += self.speed
 
     def move_left(self):
-        if self.rect.left > 0: self.rect.x -= self.speed
+        self.rect.x -= self.speed
+
+    def enemy_move(self):
+
+        if self.enemy_cycle_y:
+            if self.rect.y <= self.enemy_check_points[self.enemy_check_point_index]: self.move_vertical()
+            else: self.enemy_cycle_y = False; self.enemy_cycle_x1 = True
+
+        if self.enemy_cycle_x1:
+            if self.rect.x < 750: self.move_right()
+            else: self.enemy_cycle_x1 = False; self.enemy_cycle_x2 = True
+
+        if self.enemy_cycle_x2:
+            if self.rect.x > 50: self.move_left()
+            else: self.enemy_cycle_x2 = False; self.enemy_cycle_y = True; self.enemy_check_point_index += 1
+
 
     def destroy(self):
         if self.rect.y >= 1075:
             self.kill()
 
-    def update(self):
-        self.move_vertical()
-        # self.move_right()
-        # self.move_left()
+    def update(self,screen):
+        self.enemy_move()
+        self.draw_health(screen)
         self.destroy()
+        self.is_died()
 

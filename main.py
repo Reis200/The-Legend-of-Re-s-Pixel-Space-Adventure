@@ -96,7 +96,8 @@ class Main:
 
                 if event.type == self.enemy_bullet_timer:
                     for enemy_ship in self.enemy_sprite_group.sprites():
-                        self.enemy_assets_group.add(EnemyBullets(enemy_ship))
+                        if enemy_ship.alive():
+                            self.enemy_assets_group.add(EnemyBullets(enemy_ship))
 
 
 
@@ -111,7 +112,7 @@ class Main:
 
             # draw and update enemies
             self.enemy_sprite_group.draw(self.screen)
-            self.enemy_sprite_group.update()
+            self.enemy_sprite_group.update(self.screen)
 
             # draw and update enemy bullets
             self.enemy_assets_group.draw(self.screen)
@@ -119,7 +120,10 @@ class Main:
 
 
             # player bullets and enemy collision
-            pygame.sprite.groupcollide(self.player_assets_group,self.enemy_sprite_group, True, True)
+            if self.enemy_sprite_group.sprites() != None:
+                if pygame.sprite.groupcollide(self.player_assets_group,self.enemy_sprite_group, True, False):
+                    for enemy in self.enemy_sprite_group.sprites():
+                        enemy.decrease_health(100)
 
             if self.player_sprite_group.sprite != None:
                 # enemy bullets and player collision
