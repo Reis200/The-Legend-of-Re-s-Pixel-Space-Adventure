@@ -13,13 +13,17 @@ class PlayerShip(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center = (400,900))
 
         # health for player
-        self.current_health = 200
+        self.current_health = 100
         self.target_health = 200
         self.max_health = 200
-        self.health_bar_length = 400
+        self.health_bar_length = 100
         self.health_ratio = self.max_health / self.health_bar_length
-        self.health_change_speed = 1
+        self.health_change_speed = 0.8
         self.health_bar_color = (255,0,0)
+
+        # compass and navigator
+        self.compass = pygame.transform.rotozoom(pygame.image.load("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/compass.png").convert_alpha(),0,2)
+        self.compass_rect = self.compass.get_rect(center = (75,900))
 
     def draw_health(self,screen):
         transition_width = 0
@@ -31,16 +35,18 @@ class PlayerShip(pygame.sprite.Sprite):
             transition_color = (0,255,0)
         if self.current_health > self.target_health:
             self.current_health -= self.health_change_speed
-            transition_width = int((self.target_health - self.current_health) / self.health_ratio)
+            transition_width = int((self.current_health - self.target_health) / self.health_ratio)
             transition_color = (255,255,0)
 
         health_bar_rect = pygame.Rect(10,970,int(self.current_health / self.health_ratio),25)
         transition_bar_rect = pygame.Rect(health_bar_rect.right,970,transition_width,25)
 
         pygame.draw.rect(screen, self.health_bar_color, health_bar_rect)
-        pygame.draw.rect(screen, transition_color, transition_bar_rect)
+        if self.current_health != 100: pygame.draw.rect(screen, transition_color, transition_bar_rect)
         pygame.draw.rect(screen, (255, 255, 255), (10,970,self.health_bar_length,25), 4)
 
+    def draw_navigator(self,screen):
+        screen.blit(self.compass,self.compass_rect)
 
     def increase_health(self, amount):
         if self.target_health < self.max_health:
@@ -69,6 +75,7 @@ class PlayerShip(pygame.sprite.Sprite):
     def update(self, screen):
         self.player_movement()
         self.draw_health(screen)
+        self.draw_navigator(screen)
         self.is_died()
 
 

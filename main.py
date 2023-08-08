@@ -97,7 +97,6 @@ class Main:
                 if event.type == self.enemy_bullet_timer:
                     for enemy_ship in self.enemy_sprite_group.sprites():
                         self.enemy_assets_group.add(EnemyBullets(enemy_ship))
-                        self.enemy_assets_group.add(EnemyBullets(enemy_ship))
 
 
 
