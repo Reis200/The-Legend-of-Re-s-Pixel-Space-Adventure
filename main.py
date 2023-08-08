@@ -33,7 +33,7 @@ class Main:
         self.clock = pygame.time.Clock()
 
         # Objects
-        self.lvl_manager = LvlManager()
+
 
         # Sprite Groups - Player
         self.player_sprite_group = pygame.sprite.GroupSingle()
@@ -44,11 +44,16 @@ class Main:
 
         # Sprite Groups - Enemy
         self.enemy_sprite_group = pygame.sprite.Group()
+        self.enemy_assets_group = pygame.sprite.Group()
 
 
         # Timer
         self.enemy_spawn_timer = pygame.USEREVENT + 1
-        pygame.time.set_timer(self.enemy_spawn_timer, 1000)
+        pygame.time.set_timer(self.enemy_spawn_timer, 2000)
+
+        self.enemy_bullet_timer = pygame.USEREVENT + 2
+        pygame.time.set_timer(self.enemy_bullet_timer, 1000)
+
 
     def draw_game_background(self):
         self.screen.fill((28, 41, 81))
@@ -76,17 +81,30 @@ class Main:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     exit()
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                    self.player_assets_group.add(PlayerBullets(self.player))
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE and self.player_sprite_group.sprite != None:
+                        self.player_assets_group.add(PlayerBullets(self.player))
+                    if event.key == pygame.K_e and self.player_sprite_group.sprite != None:
+                        print(self.player_sprite_group.sprite.current_health)
+                        self.player_sprite_group.sprite.decrease_health(20)
+                    if event.key == pygame.K_a and self.player_sprite_group.sprite != None:
+                        print(self.player_sprite_group.sprite.current_health)
+                        self.player_sprite_group.sprite.increase_health(20)
+
                 if event.type == self.enemy_spawn_timer:
                     self.enemy_sprite_group.add(EnemyShip(1))
+
+                if event.type == self.enemy_bullet_timer:
+                    for enemy_ship in self.enemy_sprite_group.sprites():
+                        self.enemy_assets_group.add(EnemyBullets(enemy_ship))
+                        self.enemy_assets_group.add(EnemyBullets(enemy_ship))
 
 
 
 
             # draw and update player sprite
             self.player_sprite_group.draw(self.screen)
-            self.player_sprite_group.update()
+            self.player_sprite_group.update(self.screen)
 
             # draw and update player bullets
             self.player_assets_group.draw(self.screen)
@@ -96,12 +114,23 @@ class Main:
             self.enemy_sprite_group.draw(self.screen)
             self.enemy_sprite_group.update()
 
+            # draw and update enemy bullets
+            self.enemy_assets_group.draw(self.screen)
+            self.enemy_assets_group.update()
+
+
             # player bullets and enemy collision
             pygame.sprite.groupcollide(self.player_assets_group,self.enemy_sprite_group, True, True)
 
+            if self.player_sprite_group.sprite != None:
+                # enemy bullets and player collision
+                if pygame.sprite.spritecollide(self.player_sprite_group.sprite,self.enemy_assets_group, True):
+                    self.player_sprite_group.sprite.decrease_health(10)
 
-            # enemy and player collision
-            if pygame.sprite.spritecollide(self.player_sprite_group.sprite,self.enemy_sprite_group,True): exit();player_sprite_group.sprite.kill()
+
+                # enemy and player collision
+                if pygame.sprite.spritecollide(self.player_sprite_group.sprite, self.enemy_sprite_group, True):
+                    self.player_sprite_group.sprite.decrease_health(10)
 
             pygame.display.update()
             self.clock.tick(60)
