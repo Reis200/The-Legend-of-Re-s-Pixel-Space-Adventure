@@ -25,8 +25,8 @@ class Main:
         self.bg6 = pygame.transform.rotozoom(pygame.image.load("desolate_places/Starry Peaks.png").convert_alpha(), 0 , 3)
 
         # Game_states
-        self.start_menu = True
-        self.in_game = False
+        self.start_menu = False
+        self.in_game = True
         self.in_menu = False
 
         # clock
@@ -54,18 +54,47 @@ class Main:
         self.enemy_bullet_timer = pygame.USEREVENT + 2
         pygame.time.set_timer(self.enemy_bullet_timer, 1000)
 
-
     def draw_game_background(self):
         self.screen.fill((28, 41, 81))
         self.screen.blit(self.bg1,(0,0))
-
-
 
     def start_menu_operation(self):
         pass
 
     def in_game_operation(self):
-        pass
+
+        self.draw_game_background()
+
+        # draw and update player sprite
+        self.player_sprite_group.draw(self.screen)
+        self.player_sprite_group.update(self.screen)
+
+        # draw and update player bullets
+        self.player_assets_group.draw(self.screen)
+        self.player_assets_group.update()
+
+        # draw and update enemies
+        self.enemy_sprite_group.draw(self.screen)
+        self.enemy_sprite_group.update(self.screen)
+
+        # draw and update enemy bullets
+        self.enemy_assets_group.draw(self.screen)
+        self.enemy_assets_group.update()
+
+        # player bullets and enemy collision
+        if self.enemy_sprite_group.sprites() != None:
+            for enemy in self.enemy_sprite_group.sprites():
+                if pygame.sprite.spritecollide(enemy, self.player_assets_group, True):
+                    enemy.decrease_health(50)
+
+        if self.player_sprite_group.sprite != None:
+            # enemy bullets and player collision
+            if pygame.sprite.spritecollide(self.player_sprite_group.sprite, self.enemy_assets_group, True):
+                self.player_sprite_group.sprite.decrease_health(10)
+
+            # enemy and player collision
+            if pygame.sprite.spritecollide(self.player_sprite_group.sprite, self.enemy_sprite_group, True):
+                self.player_sprite_group.sprite.decrease_health(10)
 
     def in_menu_operation(self):
         pass
@@ -74,8 +103,6 @@ class Main:
 
     def pygame_loop(self):
         while True:
-
-            self.draw_game_background()
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -99,41 +126,7 @@ class Main:
                         if enemy_ship.alive():
                             self.enemy_assets_group.add(EnemyBullets(enemy_ship))
 
-
-
-
-            # draw and update player sprite
-            self.player_sprite_group.draw(self.screen)
-            self.player_sprite_group.update(self.screen)
-
-            # draw and update player bullets
-            self.player_assets_group.draw(self.screen)
-            self.player_assets_group.update()
-
-            # draw and update enemies
-            self.enemy_sprite_group.draw(self.screen)
-            self.enemy_sprite_group.update(self.screen)
-
-            # draw and update enemy bullets
-            self.enemy_assets_group.draw(self.screen)
-            self.enemy_assets_group.update()
-
-
-            # player bullets and enemy collision
-            if self.enemy_sprite_group.sprites() != None:
-                if pygame.sprite.groupcollide(self.player_assets_group,self.enemy_sprite_group, True, False):
-                    for enemy in self.enemy_sprite_group.sprites():
-                        enemy.decrease_health(100)
-
-            if self.player_sprite_group.sprite != None:
-                # enemy bullets and player collision
-                if pygame.sprite.spritecollide(self.player_sprite_group.sprite,self.enemy_assets_group, True):
-                    self.player_sprite_group.sprite.decrease_health(10)
-
-
-                # enemy and player collision
-                if pygame.sprite.spritecollide(self.player_sprite_group.sprite, self.enemy_sprite_group, True):
-                    self.player_sprite_group.sprite.decrease_health(10)
+            self.in_game_operation()
 
             pygame.display.update()
             self.clock.tick(60)

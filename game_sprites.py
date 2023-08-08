@@ -16,7 +16,7 @@ class PlayerShip(pygame.sprite.Sprite):
         self.current_health = 400
         self.target_health = 400
         self.max_health = 400
-        self.health_bar_length = 100
+        self.health_bar_length = 200
         self.health_ratio = self.max_health / self.health_bar_length
         self.health_change_speed = 0.8
         self.health_bar_color = (255,0,0)
@@ -63,10 +63,20 @@ class PlayerShip(pygame.sprite.Sprite):
     def player_movement(self):
         keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_RIGHT]: self.rect.x += self.speed
-        if keys[pygame.K_LEFT]: self.rect.x -= self.speed
-        if keys[pygame.K_UP]: self.rect.y -= self.speed
-        if keys[pygame.K_DOWN]: self.rect.y += self.speed
+
+        if keys[pygame.K_RIGHT]:
+            if self.rect.right < 800: self.rect.x += self.speed
+
+        if keys[pygame.K_LEFT]:
+            if self.rect.left > 0: self.rect.x -= self.speed
+
+        if keys[pygame.K_UP]:
+            if self.rect.top > 0: self.rect.y -= self.speed
+
+
+        if keys[pygame.K_DOWN]:
+            if self.rect.bottom < 1000: self.rect.y += self.speed
+
 
     def is_died(self):
         if self.current_health <= 0:
