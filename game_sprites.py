@@ -137,7 +137,8 @@ class EnemyShip(pygame.sprite.Sprite):
                     4:"The-Legend-of-Reis-Pixel-Space-Adventure-Assets/enemy_small_boat.png",
                     5:"The-Legend-of-Reis-Pixel-Space-Adventure-Assets/enemy_small_boat_bomb.png",
                     6:"The-Legend-of-Reis-Pixel-Space-Adventure-Assets/enemy_small_boat_triplegun.png",
-                    7:"The-Legend-of-Reis-Pixel-Space-Adventure-Assets/Pixel space ships boss.png"}
+                    7:"The-Legend-of-Reis-Pixel-Space-Adventure-Assets/satellite_laser_gun.png",
+                    8:"The-Legend-of-Reis-Pixel-Space-Adventure-Assets/Pixel space ships boss.png"}
 
     def __init__(self, enemy_id):
         super().__init__()
@@ -158,18 +159,24 @@ class EnemyShip(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center = (randint(80,750),randint(-300,-50)))
 
         match enemy_id:
-            case 1: self.speed = 3
-            case 2: self.speed = 3
-            case 3: self.speed = 3
-            case 4: self.speed = 5
-            case 5: self.speed = 5
-            case 6: self.speed = 4
-            case 7: self.speed = 1
+            case 1:
+                self.speed = 3; self.current_health = 100; self.target_health = 100; self.max_health = 100
+            case 2:
+                self.speed = 3; self.current_health = 100; self.target_health = 100; self.max_health = 100
+            case 3:
+                self.speed = 3; self.current_health = 100; self.target_health = 100; self.max_health = 100
+            case 4:
+                self.speed = 6; self.current_health = 50; self.target_health = 50; self.max_health = 50
+            case 5:
+                self.speed = 3; self.current_health = 300; self.target_health = 300; self.max_health = 300
+            case 6:
+                self.speed = 5; self.current_health = 200; self.target_health = 200; self.max_health = 200
+            case 7:
+                self.speed = 5; self.current_health = 250; self.target_health = 250; self.max_health = 250
+            case 8:
+                self.speed = 1; self.current_health = 500; self.target_health = 500; self.max_health = 500
 
         # health for enemy
-        self.current_health = 100
-        self.target_health = 100
-        self.max_health = 100
         self.health_bar_length = 75
         self.health_ratio = self.max_health / self.health_bar_length
         self.health_change_speed = 5
