@@ -110,8 +110,6 @@ class PlayerBullets(pygame.sprite.Sprite):
     def update(self):
         self.shoot()
 
-
-
 class EnemyBullets(pygame.sprite.Sprite):
     def __init__(self,enemy):
         super().__init__()
@@ -131,12 +129,11 @@ class EnemyBullets(pygame.sprite.Sprite):
     def update(self):
         self.shoot()
 
-
 class EnemyShip(pygame.sprite.Sprite):
 
     enemies_dict = {1:"The-Legend-of-Reis-Pixel-Space-Adventure-Assets/enemy_ship_1.png",
                     2:"The-Legend-of-Reis-Pixel-Space-Adventure-Assets/enemy_ship_2.png",
-                    3:"The-Legend-of-Reis-Pixel-Space-Adventure-Assets/enemy_ship3.png",
+                    3:"The-Legend-of-Reis-Pixel-Space-Adventure-Assets/enemy_ship_3.png",
                     4:"The-Legend-of-Reis-Pixel-Space-Adventure-Assets/enemy_small_boat.png",
                     5:"The-Legend-of-Reis-Pixel-Space-Adventure-Assets/enemy_small_boat_bomb.png",
                     6:"The-Legend-of-Reis-Pixel-Space-Adventure-Assets/enemy_small_boat_triplegun.png",
@@ -144,6 +141,7 @@ class EnemyShip(pygame.sprite.Sprite):
 
     def __init__(self, enemy_id):
         super().__init__()
+
 
         if enemy_id <= 3: self.bullet_lvl = 0
         else: self.bullet_lvl = 1
@@ -209,10 +207,12 @@ class EnemyShip(pygame.sprite.Sprite):
         if self.current_health != 100: pygame.draw.rect(screen, transition_color, transition_bar_rect)
         pygame.draw.rect(screen, (255, 255, 255), (self.rect.left,self.rect.top - 10,self.health_bar_length,10), 4)
 
-    def is_died(self):
+    def is_died(self, lvl_manager):
         if self.current_health <= 0:
             self.kill()
+            lvl_manager.increase_progress()
 
+        return lvl_manager
 
     def move_vertical(self):
         self.rect.y += self.speed
@@ -242,9 +242,9 @@ class EnemyShip(pygame.sprite.Sprite):
         if self.rect.y >= 1075:
             self.kill()
 
-    def update(self,screen):
+    def update(self,screen,lvl_manager):
         self.enemy_move()
         self.draw_health(screen)
         self.destroy()
-        self.is_died()
+        return self.is_died(lvl_manager)
 

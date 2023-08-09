@@ -1,6 +1,7 @@
 import pygame
 from sys import exit
 from game_sprites import *
+from game_managers import *
 from random import choice,randint
 
 
@@ -9,20 +10,15 @@ class Main:
     def __init__(self):
         pygame.init()
 
+
         # game window
         self.screen = pygame.display.set_mode((800, 1000))
         pygame.display.set_caption("The-Legend-of-Reis-Pixel-Space-Adventure")
         icon = pygame.image.load("Youtube Icons1.png").convert_alpha()
         pygame.display.set_icon(icon)
 
-
-        # Game images
-        self.bg1 = pygame.transform.rotozoom(pygame.image.load("desolate_places/Cloudy Mountains.png").convert_alpha(), 0 , 3)
-        self.bg2 = pygame.transform.rotozoom(pygame.image.load("desolate_places/Dusty Moon.png").convert_alpha(), 0 , 3)
-        self.bg3 = pygame.transform.rotozoom(pygame.image.load("desolate_places/Glowing Sea.png").convert_alpha(), 0 , 3)
-        self.bg4 = pygame.transform.rotozoom(pygame.image.load("desolate_places/Hidden Desert.png").convert_alpha(), 0 , 3)
-        self.bg5 = pygame.transform.rotozoom(pygame.image.load("desolate_places/Misty Rocks.png").convert_alpha(), 0 , 3)
-        self.bg6 = pygame.transform.rotozoom(pygame.image.load("desolate_places/Starry Peaks.png").convert_alpha(), 0 , 3)
+        # Game font
+        self.game_font = pygame.font.Font("Game_font/LLPIXEL3.ttf",30)
 
         # Game_states
         self.start_menu = False
@@ -33,7 +29,7 @@ class Main:
         self.clock = pygame.time.Clock()
 
         # Objects
-
+        self.lvl_manager = LvlManager(self.game_font)
 
         # Sprite Groups - Player
         self.player_sprite_group = pygame.sprite.GroupSingle()
@@ -54,16 +50,18 @@ class Main:
         self.enemy_bullet_timer = pygame.USEREVENT + 2
         pygame.time.set_timer(self.enemy_bullet_timer, 1000)
 
-    def draw_game_background(self):
-        self.screen.fill((28, 41, 81))
-        self.screen.blit(self.bg1,(0,0))
+
 
     def start_menu_operation(self):
         pass
 
+    def in_menu_operation(self):
+        pass
+
     def in_game_operation(self):
 
-        self.draw_game_background()
+        # lvl manager
+        self.lvl_manager.update(self.screen)
 
         # draw and update player sprite
         self.player_sprite_group.draw(self.screen)
@@ -75,7 +73,9 @@ class Main:
 
         # draw and update enemies
         self.enemy_sprite_group.draw(self.screen)
-        self.enemy_sprite_group.update(self.screen)
+        self.lvl_manager_updated = self.enemy_sprite_group.update(self.screen, self.lvl_manager)
+        if self.lvl_manager_updated != None: self.lvl_manager = self.lvl_manager_updated
+
 
         # draw and update enemy bullets
         self.enemy_assets_group.draw(self.screen)
@@ -96,10 +96,6 @@ class Main:
             if pygame.sprite.spritecollide(self.player_sprite_group.sprite, self.enemy_sprite_group, True):
                 self.player_sprite_group.sprite.decrease_health(10)
 
-    def in_menu_operation(self):
-        pass
-
-
 
     def pygame_loop(self):
         while True:
@@ -111,6 +107,7 @@ class Main:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE and self.player_sprite_group.sprite != None:
                         self.player_assets_group.add(PlayerBullets(self.player))
+
                     if event.key == pygame.K_e and self.player_sprite_group.sprite != None:
                         print(self.player_sprite_group.sprite.current_health)
                         self.player_sprite_group.sprite.decrease_health(20)
@@ -118,8 +115,14 @@ class Main:
                         print(self.player_sprite_group.sprite.current_health)
                         self.player_sprite_group.sprite.increase_health(20)
 
+                    if event.key == pygame.K_h:
+                        self.lvl_manager.progress += 10
+
+
                 if event.type == self.enemy_spawn_timer:
-                    self.enemy_sprite_group.add(EnemyShip(1))
+                    for enemy_spawn_count in range(self.lvl_manager.enemy_spawn_count_per_timer):
+                        self.enemy_sprite_group.add(EnemyShip(self.lvl_manager.randomize_enemy_spawn()))
+                    # self.enemy_sprite_group.add(EnemyShip(7))
 
                 if event.type == self.enemy_bullet_timer:
                     for enemy_ship in self.enemy_sprite_group.sprites():
