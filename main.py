@@ -42,6 +42,9 @@ class Main:
         self.enemy_sprite_group = pygame.sprite.Group()
         self.enemy_assets_group = pygame.sprite.Group()
 
+        # Sprite Group - PowerUp
+        self.power_up_sprite_group = pygame.sprite.Group()
+
 
         # Timer
         self.enemy_spawn_timer = pygame.USEREVENT + 1
@@ -49,6 +52,9 @@ class Main:
 
         self.enemy_bullet_timer = pygame.USEREVENT + 2
         pygame.time.set_timer(self.enemy_bullet_timer, 1000)
+
+        self.power_up_spawn_timer = pygame.USEREVENT + 3
+        pygame.time.set_timer(self.power_up_spawn_timer, 18000)
 
 
 
@@ -62,6 +68,10 @@ class Main:
 
         # lvl manager
         self.lvl_manager.update(self.screen)
+
+        # powerups draw and update
+        self.power_up_sprite_group.draw(self.screen)
+        self.power_up_sprite_group.update()
 
         # draw and update player sprite
         self.player_sprite_group.draw(self.screen)
@@ -81,13 +91,21 @@ class Main:
         self.enemy_assets_group.draw(self.screen)
         self.enemy_assets_group.update()
 
+
+        # player and PowerUp collision
+        if self.power_up_sprite_group.sprites() != None and self.player_sprite_group.sprite != None and pygame.sprite.spritecollideany(self.player_sprite_group.sprite,self.power_up_sprite_group):
+            for power_up in self.power_up_sprite_group.sprites():
+                if pygame.sprite.spritecollide(power_up, self.player_sprite_group, False):
+                    self.player_sprite_group.sprite.apply_power_up(power_up.effect, power_up.power_up_duration)
+                    power_up.kill()
+
         # player bullets and enemy collision
         if self.enemy_sprite_group.sprites() != None:
             for enemy in self.enemy_sprite_group.sprites():
                 if pygame.sprite.spritecollide(enemy, self.player_assets_group, True):
                     enemy.decrease_health(self.player_sprite_group.sprite.damage)
 
-        if self.player_sprite_group.sprite != None and pygame.sprite.spritecollideany(self.player_sprite_group.sprite,self.enemy_sprite_group):
+        if self.player_sprite_group.sprite != None and pygame.sprite.spritecollideany(self.player_sprite_group.sprite,self.enemy_sprite_group) or pygame.sprite.spritecollideany(self.player_sprite_group.sprite,self.enemy_assets_group):
 
             # enemy bullets and player collision
             for enemy_bullet in self.enemy_assets_group.sprites():
@@ -131,6 +149,9 @@ class Main:
                     for enemy_ship in self.enemy_sprite_group.sprites():
                         if enemy_ship.alive():
                             self.enemy_assets_group.add(EnemyBullets(enemy_ship))
+
+                if event.type == self.power_up_spawn_timer:
+                    self.power_up_sprite_group.add(PowerUp())
 
             self.in_game_operation()
 

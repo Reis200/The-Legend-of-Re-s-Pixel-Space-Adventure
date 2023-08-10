@@ -2,6 +2,33 @@ import pygame
 from random import randint
 
 
+class PowerUp(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.power_up_dict = {1:pygame.transform.rotozoom(pygame.image.load("Pixel_Art_by_Reis200/heart.png").convert_alpha(),0,2),
+                              2:pygame.transform.rotozoom(pygame.image.load("Pixel_Art_by_Reis200/double_sword.png").convert_alpha(),0,2),
+                              3:pygame.transform.rotozoom(pygame.image.load("Pixel_Art_by_Reis200/speed_power_up.png").convert_alpha(),0,2)}
+
+        self.image = self.power_up_dict[randint(1,3)]
+        self.rect = self.image.get_rect(center = (randint(30,770),randint(-300,-50)))
+
+        if self.image == self.power_up_dict[1]:
+            self.effect = "increase health by 100"
+        elif self.image == self.power_up_dict[2]:
+            self.effect = "increase player damage by x2"
+        elif self.image == self.power_up_dict[3]:
+            self.effect = "increase player speed by x2"
+
+        self.power_up_duration = 10
+
+
+    def power_up_movement(self):
+        self.rect.y += 6
+        if self.rect.y >= 1050: self.kill()
+
+    def update(self):
+        self.power_up_movement()
+
 class PlayerShip(pygame.sprite.Sprite):
 
     def __init__(self):
@@ -9,7 +36,14 @@ class PlayerShip(pygame.sprite.Sprite):
 
         self.bullet_lvl = 0
         self.speed = 5
+        self.max_speed = 15
         self.damage = 50
+        self.max_damage = 200
+
+        self.in_power_up = False
+        self.power_up_effect = None
+        self.power_up_effect_duration = 0
+
         self.image = pygame.transform.rotozoom(pygame.image.load("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/copper_space_fighter.png").convert_alpha(),0,2)
         self.rect = self.image.get_rect(center = (400,900))
 
@@ -23,7 +57,7 @@ class PlayerShip(pygame.sprite.Sprite):
         self.health_bar_color = (255,0,0)
 
         # compass and navigator
-        self.compass = pygame.transform.rotozoom(pygame.image.load("Pixel_Art(by Reis200)/compass.png").convert_alpha(),0,2)
+        self.compass = pygame.transform.rotozoom(pygame.image.load("Pixel_Art_by_Reis200/compass.png").convert_alpha(),0,2)
         self.compass_rect = self.compass.get_rect(center = (75,900))
 
     def draw_health(self,screen):
@@ -78,6 +112,25 @@ class PlayerShip(pygame.sprite.Sprite):
         if keys[pygame.K_DOWN]:
             if self.rect.bottom < 1000: self.rect.y += self.speed
 
+    def apply_power_up(self,effect,duration):
+        self.in_power_up = True
+
+        match effect:
+            case "increase health by 100":
+                if self.target_health <= self.max_health - 100: self.target_health += 100
+                elif self.target_health < self.max_health: self.target_health = self.max_health
+            case "increase player damage by x2":
+                if self.damage < self.max_damage: self.damage *= 2; self.power_up_effect_duration = duration
+            case "increase player speed by x2":
+                if self.speed < self.max_speed: self.speed += 2; self.power_up_effect_duration = duration
+
+        self.power_up_effect = effect
+
+
+
+    def power_up_effect_diminisher(self):
+        self.power_up_effect_duration -= 0.01
+        if self.power_up_effect_duration <= 0: self.in_power_up = False; self.power_up_effect_duration = 0
 
     def is_died(self):
         if self.current_health <= 0:
@@ -87,6 +140,10 @@ class PlayerShip(pygame.sprite.Sprite):
         self.player_movement()
         self.draw_health(screen)
         self.draw_navigator(screen)
+        if self.in_power_up: self.power_up_effect_diminisher()
+        if self.power_up_effect != None and self.power_up_effect == "increase player damage by x2" and self.in_power_up == False: self.damage = 50
+        if self.power_up_effect != None and self.power_up_effect == "increase player speed by x2" and self.in_power_up == False: self.speed = 5
+        print(f"health: {self.target_health}, damage: {self.damage}, speed: {self.speed}, current_duration: {self.power_up_effect_duration}")
         self.is_died()
 
 
