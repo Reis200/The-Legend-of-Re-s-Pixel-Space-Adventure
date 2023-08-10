@@ -85,16 +85,19 @@ class Main:
         if self.enemy_sprite_group.sprites() != None:
             for enemy in self.enemy_sprite_group.sprites():
                 if pygame.sprite.spritecollide(enemy, self.player_assets_group, True):
-                    enemy.decrease_health(50)
+                    enemy.decrease_health(self.player_sprite_group.sprite.damage)
 
-        if self.player_sprite_group.sprite != None:
+        if self.player_sprite_group.sprite != None and pygame.sprite.spritecollideany(self.player_sprite_group.sprite,self.enemy_sprite_group):
+
             # enemy bullets and player collision
-            if pygame.sprite.spritecollide(self.player_sprite_group.sprite, self.enemy_assets_group, True):
-                self.player_sprite_group.sprite.decrease_health(10)
+            for enemy_bullet in self.enemy_assets_group.sprites():
+                if pygame.sprite.spritecollide(self.player_sprite_group.sprite, self.enemy_assets_group, True):
+                    self.player_sprite_group.sprite.decrease_health(enemy_bullet.bullet_damage)
 
             # enemy and player collision
-            if pygame.sprite.spritecollide(self.player_sprite_group.sprite, self.enemy_sprite_group, True):
-                self.player_sprite_group.sprite.decrease_health(10)
+            for enemy in self.enemy_sprite_group.sprites():
+                if pygame.sprite.spritecollide(self.player_sprite_group.sprite, self.enemy_sprite_group, True):
+                    self.player_sprite_group.sprite.decrease_health(enemy.damage * 1.5)
 
 
     def pygame_loop(self):

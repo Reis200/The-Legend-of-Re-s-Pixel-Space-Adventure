@@ -9,6 +9,7 @@ class PlayerShip(pygame.sprite.Sprite):
 
         self.bullet_lvl = 0
         self.speed = 5
+        self.damage = 50
         self.image = pygame.transform.rotozoom(pygame.image.load("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/copper_space_fighter.png").convert_alpha(),0,2)
         self.rect = self.image.get_rect(center = (400,900))
 
@@ -22,7 +23,7 @@ class PlayerShip(pygame.sprite.Sprite):
         self.health_bar_color = (255,0,0)
 
         # compass and navigator
-        self.compass = pygame.transform.rotozoom(pygame.image.load("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/compass.png").convert_alpha(),0,2)
+        self.compass = pygame.transform.rotozoom(pygame.image.load("Pixel_Art(by Reis200)/compass.png").convert_alpha(),0,2)
         self.compass_rect = self.compass.get_rect(center = (75,900))
 
     def draw_health(self,screen):
@@ -118,6 +119,7 @@ class EnemyBullets(pygame.sprite.Sprite):
         self.bullet_2 = pygame.transform.rotozoom(pygame.image.load("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/enemy_bullet_1.png").convert_alpha(), 0, 4)
         self.bullets_list = [self.bullet_1, self.bullet_2]
         self.bullet_index = enemy.bullet_lvl
+        self.bullet_damage = enemy.damage
 
         self.image = self.bullets_list[self.bullet_index]
         self.rect = self.image.get_rect(center = enemy.rect.midbottom)
@@ -156,25 +158,25 @@ class EnemyShip(pygame.sprite.Sprite):
 
         # enemy_id in from 1 - 7
         self.image = pygame.transform.rotozoom(pygame.image.load(self.enemies_dict[enemy_id]),0,3)
-        self.rect = self.image.get_rect(center = (randint(80,750),randint(-300,-50)))
+        self.rect = self.image.get_rect(center = (randint(50,750),randint(-300,-50)))
 
         match enemy_id:
             case 1:
-                self.speed = 3; self.current_health = 100; self.target_health = 100; self.max_health = 100
+                self.damage = 10; self.speed = 3; self.current_health = 100; self.target_health = 100; self.max_health = 100
             case 2:
-                self.speed = 3; self.current_health = 100; self.target_health = 100; self.max_health = 100
+                self.damage = 10; self.speed = 3; self.current_health = 100; self.target_health = 100; self.max_health = 100
             case 3:
-                self.speed = 3; self.current_health = 100; self.target_health = 100; self.max_health = 100
+                self.damage = 10; self.speed = 3; self.current_health = 100; self.target_health = 100; self.max_health = 100
             case 4:
-                self.speed = 6; self.current_health = 50; self.target_health = 50; self.max_health = 50
+                self.damage = 20; self.speed = 6; self.current_health = 50; self.target_health = 50; self.max_health = 50
             case 5:
-                self.speed = 3; self.current_health = 300; self.target_health = 300; self.max_health = 300
+                self.damage = 50; self.speed = 3; self.current_health = 300; self.target_health = 300; self.max_health = 300
             case 6:
-                self.speed = 5; self.current_health = 200; self.target_health = 200; self.max_health = 200
+                self.damage = 20; self.speed = 5; self.current_health = 200; self.target_health = 200; self.max_health = 200
             case 7:
-                self.speed = 5; self.current_health = 250; self.target_health = 250; self.max_health = 250
+                self.damage = 50; self.speed = 5; self.current_health = 250; self.target_health = 250; self.max_health = 250
             case 8:
-                self.speed = 1; self.current_health = 500; self.target_health = 500; self.max_health = 500
+                self.damage = 100; self.speed = 1; self.current_health = 500; self.target_health = 500; self.max_health = 500
 
         # health for enemy
         self.health_bar_length = 75
@@ -237,11 +239,11 @@ class EnemyShip(pygame.sprite.Sprite):
             else: self.enemy_cycle_y = False; self.enemy_cycle_x1 = True
 
         if self.enemy_cycle_x1:
-            if self.rect.x < 750: self.move_right()
+            if self.rect.right < 780: self.move_right()
             else: self.enemy_cycle_x1 = False; self.enemy_cycle_x2 = True
 
         if self.enemy_cycle_x2:
-            if self.rect.x > 50: self.move_left()
+            if self.rect.left > 20: self.move_left()
             else: self.enemy_cycle_x2 = False; self.enemy_cycle_y = True; self.enemy_check_point_index += 1
 
 
