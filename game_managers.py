@@ -106,12 +106,39 @@ class StartMenu:
         self.button_text = self.font.render("PLAY", False, (255,255,255))
         self.button_text_rect = self.button_text.get_rect(center = (400,445))
 
+        # menu button
+        self.menu_button_list = [button1, button2, button3]
+        self.menu_button_animation_index = 0
+        self.menu_button = self.menu_button_list[self.menu_button_animation_index]
+        self.menu_button_rect = self.menu_button.get_rect(center=(400, 550))
+
+        self.menu_button_text = self.font.render("MENU", False, (255, 255, 255))
+        self.menu_button_text_rect = self.menu_button_text.get_rect(center=(400, 545))
+
+        # story button
+        self.story_button_list = [button1, button2, button3]
+        self.story_button_animation_index = 0
+        self.story_button = self.story_button_list[self.story_button_animation_index]
+        self.story_button_rect = self.story_button.get_rect(center=(400, 650))
+
+        self.story_button_text = self.font.render("STORY", False, (255, 255, 255))
+        self.story_button_text_rect = self.story_button_text.get_rect(center=(400, 645))
 
 
-    def animate_button(self):
+    def animate_play_button(self):
         self.button_animation_index += 0.1
         if self.button_animation_index >= len(self.button_list): self.button_animation_index = 0
         self.button = self.button_list[int(self.button_animation_index)]
+
+    def animate_menu_button(self):
+        self.menu_button_animation_index += 0.1
+        if self.menu_button_animation_index >= len(self.menu_button_list): self.menu_button_animation_index = 0
+        self.menu_button = self.menu_button_list[int(self.menu_button_animation_index)]
+
+    def animate_story_button(self):
+        self.story_button_animation_index += 0.1
+        if self.story_button_animation_index >= len(self.story_button_list): self.story_button_animation_index = 0
+        self.story_button = self.story_button_list[int(self.story_button_animation_index)]
 
 
 
@@ -120,10 +147,20 @@ class StartMenu:
         screen.blit(self.title_text1,self.title_text_rect1)
         screen.blit(self.title_text2, self.title_text_rect2)
 
-        # button
-        self.animate_button()
+        # play button
+        self.animate_play_button()
         screen.blit(self.button,self.button_rect)
         screen.blit(self.button_text,self.button_text_rect)
+
+        # menu button
+        self.animate_menu_button()
+        screen.blit(self.menu_button, self.menu_button_rect)
+        screen.blit(self.menu_button_text, self.menu_button_text_rect)
+
+        # menu button
+        self.animate_story_button()
+        screen.blit(self.story_button, self.story_button_rect)
+        screen.blit(self.story_button_text, self.story_button_text_rect)
 
 
 class OverMenu(StartMenu):
