@@ -17,19 +17,23 @@ class Main:
         icon = pygame.image.load("Youtube Icons1.png").convert_alpha()
         pygame.display.set_icon(icon)
 
+
+
         # Game font
         self.game_font = pygame.font.Font("Game_font/LLPIXEL3.ttf",30)
 
         # Game_states
-        self.start_menu = False
-        self.in_game = True
-        self.in_menu = False
+        self.in_start_menu = True
+        self.in_game = False
+        self.in_over_menu = False
 
         # clock
         self.clock = pygame.time.Clock()
 
         # Objects
         self.lvl_manager = LvlManager(self.game_font)
+        self.start_menu_manager = StartMenu()
+        self.over_menu_manager = OverMenu()
 
         # Sprite Groups - Player
         self.player_sprite_group = pygame.sprite.GroupSingle()
@@ -58,11 +62,11 @@ class Main:
 
 
 
-    def start_menu_operation(self):
-        pass
+    def in_start_menu_operation(self):
+        self.start_menu_manager.update(self.screen)
 
-    def in_menu_operation(self):
-        pass
+    def in_over_menu_operation(self):
+        self.over_menu_manager.update(self.screen)
 
     def in_game_operation(self):
 
@@ -91,31 +95,44 @@ class Main:
         self.enemy_assets_group.draw(self.screen)
         self.enemy_assets_group.update()
 
+        if self.player_sprite_group.sprite != None:
 
-        # player and PowerUp collision
-        if self.power_up_sprite_group.sprites() != None and self.player_sprite_group.sprite != None and pygame.sprite.spritecollideany(self.player_sprite_group.sprite,self.power_up_sprite_group):
-            for power_up in self.power_up_sprite_group.sprites():
-                if pygame.sprite.spritecollide(power_up, self.player_sprite_group, False):
-                    self.player_sprite_group.sprite.apply_power_up(power_up.effect, power_up.power_up_duration)
-                    power_up.kill()
+            # player and PowerUp collision
+            if self.power_up_sprite_group.sprites() != None and self.player_sprite_group.sprite != None and pygame.sprite.spritecollideany(self.player_sprite_group.sprite,self.power_up_sprite_group):
+                for power_up in self.power_up_sprite_group.sprites():
+                    if pygame.sprite.spritecollide(power_up, self.player_sprite_group, False):
+                        self.player_sprite_group.sprite.apply_power_up(power_up.effect, power_up.power_up_duration)
+                        power_up.kill()
 
-        # player bullets and enemy collision
-        if self.enemy_sprite_group.sprites() != None:
-            for enemy in self.enemy_sprite_group.sprites():
-                if pygame.sprite.spritecollide(enemy, self.player_assets_group, True):
-                    enemy.decrease_health(self.player_sprite_group.sprite.damage)
+            # player bullets and enemy collision
+            if self.enemy_sprite_group.sprites() != None:
+                for enemy in self.enemy_sprite_group.sprites():
+                    if pygame.sprite.spritecollide(enemy, self.player_assets_group, True):
+                        enemy.decrease_health(self.player_sprite_group.sprite.damage)
 
-        if self.player_sprite_group.sprite != None and pygame.sprite.spritecollideany(self.player_sprite_group.sprite,self.enemy_sprite_group) or pygame.sprite.spritecollideany(self.player_sprite_group.sprite,self.enemy_assets_group):
+            if self.enemy_sprite_group.sprites() != None and pygame.sprite.spritecollideany(self.player_sprite_group.sprite,self.enemy_sprite_group) or pygame.sprite.spritecollideany(self.player_sprite_group.sprite,self.enemy_assets_group):
 
-            # enemy bullets and player collision
-            for enemy_bullet in self.enemy_assets_group.sprites():
-                if pygame.sprite.spritecollide(self.player_sprite_group.sprite, self.enemy_assets_group, True):
-                    self.player_sprite_group.sprite.decrease_health(enemy_bullet.bullet_damage)
+                # enemy bullets and player collision
+                for enemy_bullet in self.enemy_assets_group.sprites():
+                    if pygame.sprite.spritecollide(self.player_sprite_group.sprite, self.enemy_assets_group, True):
+                        self.player_sprite_group.sprite.decrease_health(enemy_bullet.bullet_damage)
 
-            # enemy and player collision
-            for enemy in self.enemy_sprite_group.sprites():
-                if pygame.sprite.spritecollide(self.player_sprite_group.sprite, self.enemy_sprite_group, True):
-                    self.player_sprite_group.sprite.decrease_health(enemy.damage * 1.5)
+
+                # enemy and player collision
+                for enemy in self.enemy_sprite_group.sprites():
+                    if pygame.sprite.spritecollide(self.player_sprite_group.sprite, self.enemy_sprite_group, True):
+                        self.player_sprite_group.sprite.decrease_health(enemy.damage * 1.5)
+
+        if self.player_sprite_group.sprite == None:
+            self.enemy_sprite_group.empty()
+            self.enemy_assets_group.empty()
+            self.power_up_sprite_group.empty()
+            self.player_sprite_group.empty()
+            self.player_assets_group.empty()
+            self.lvl_manager.lvl = 1
+            self.lvl_manager.progress = 0
+            self.in_game = False; self.in_over_menu = True
+
 
 
     def pygame_loop(self):
@@ -125,9 +142,24 @@ class Main:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     exit()
-                if event.type == pygame.KEYDOWN:
+
+                if event.type == pygame.MOUSEBUTTONDOWN and self.in_start_menu:
+                    if self.start_menu_manager.button_rect.collidepoint(event.pos):
+                        self.in_start_menu = False; self.in_game = True
+
+                if event.type == pygame.MOUSEBUTTONDOWN and self.in_over_menu:
+                    if self.over_menu_manager.button_rect.collidepoint(event.pos):
+                        self.in_over_menu = False
+                        self.in_game = True
+                        self.player_sprite_group.add(PlayerShip())
+                        print("")
+
+
+
+
+                if event.type == pygame.KEYDOWN and self.in_game:
                     if event.key == pygame.K_SPACE and self.player_sprite_group.sprite != None:
-                        self.player_assets_group.add(PlayerBullets(self.player))
+                        self.player_assets_group.add(PlayerBullets(self.player_sprite_group.sprite))
 
                     if event.key == pygame.K_e and self.player_sprite_group.sprite != None:
                         print(self.player_sprite_group.sprite.current_health)
@@ -140,20 +172,23 @@ class Main:
                         self.lvl_manager.progress += 10
 
 
-                if event.type == self.enemy_spawn_timer:
+                if event.type == self.enemy_spawn_timer and self.in_game:
                     for enemy_spawn_count in range(self.lvl_manager.enemy_spawn_count_per_timer):
                         self.enemy_sprite_group.add(EnemyShip(self.lvl_manager.randomize_enemy_spawn()))
                     # self.enemy_sprite_group.add(EnemyShip(7))
 
-                if event.type == self.enemy_bullet_timer:
+                if event.type == self.enemy_bullet_timer and self.in_game:
                     for enemy_ship in self.enemy_sprite_group.sprites():
                         if enemy_ship.alive():
                             self.enemy_assets_group.add(EnemyBullets(enemy_ship))
 
-                if event.type == self.power_up_spawn_timer:
+                if event.type == self.power_up_spawn_timer and self.in_game:
                     self.power_up_sprite_group.add(PowerUp())
 
-            self.in_game_operation()
+
+            if self.in_start_menu: self.in_start_menu_operation()
+            if self.in_game: self.in_game_operation()
+            if self.in_over_menu: self.in_over_menu_operation()
 
             pygame.display.update()
             self.clock.tick(60)

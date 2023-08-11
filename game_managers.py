@@ -1,5 +1,6 @@
 import pygame
 from random import randint
+from math import sqrt
 
 class LvlManager:
     def __init__(self, game_font):
@@ -70,3 +71,101 @@ class LvlManager:
         self.draw_progress_bar(screen)
         self.check_lvl_finish()
         if self.is_lvl_finish: self.Lvl_bar_update()
+
+
+class StartMenu:
+    def __init__(self):
+
+        self.backgrounds_dict = {1:"Space_Backgrounds/Space Background_1.png",
+                                 2:"Space_Backgrounds/Space Background_2.png",
+                                 3:"Space_Backgrounds/Space Background_3.png",
+                                 4:"Space_Backgrounds/Space Background_4.png",
+                                 5:"Space_Backgrounds/Space Background_5.png"}
+
+        self.background = pygame.image.load(self.backgrounds_dict[randint(1,5)]).convert()
+        self.background_rect = self.background.get_rect(topleft = (0,0))
+
+
+        # menu text
+        self.font = pygame.font.Font("Game_font/LLPIXEL3.ttf",50)
+        self.title_text1 = self.font.render("The Legend of Reis", False, (255,255,255))
+        self.title_text_rect1 = self.title_text1.get_rect(center = (400,300))
+        self.title_text2 = self.font.render("Pixel Space Adventure", False, (255, 255, 255))
+        self.title_text_rect2 = self.title_text2.get_rect(center=(400, 350))
+
+        # play button
+        button1 = pygame.transform.rotozoom(pygame.image.load("UI_assets/[6] Silver/[1] Normal.png").convert_alpha(),0,4)
+        button2 = pygame.transform.rotozoom(pygame.image.load("UI_assets/[6] Silver/[2] Clicked.png").convert_alpha(),0,4)
+        button3 = pygame.transform.rotozoom(pygame.image.load("UI_assets/[6] Silver/[3] Hover.png").convert_alpha(),0,4)
+
+        self.button_list = [button1,button2,button3]
+        self.button_animation_index = 0
+        self.button = self.button_list[self.button_animation_index]
+        self.button_rect = self.button.get_rect(center = (400,450))
+
+        self.button_text = self.font.render("PLAY", False, (255,255,255))
+        self.button_text_rect = self.button_text.get_rect(center = (400,445))
+
+
+
+    def animate_button(self):
+        self.button_animation_index += 0.1
+        if self.button_animation_index >= len(self.button_list): self.button_animation_index = 0
+        self.button = self.button_list[int(self.button_animation_index)]
+
+
+
+    def update(self,screen):
+        screen.blit(self.background,self.background_rect)
+        screen.blit(self.title_text1,self.title_text_rect1)
+        screen.blit(self.title_text2, self.title_text_rect2)
+
+        # button
+        self.animate_button()
+        screen.blit(self.button,self.button_rect)
+        screen.blit(self.button_text,self.button_text_rect)
+
+
+class OverMenu(StartMenu):
+    def __init__(self):
+
+        self.backgrounds_dict = {6: "Space_Backgrounds/Space Background_6.png",
+                                 7: "Space_Backgrounds/Space Background_7.png",
+                                 8: "Space_Backgrounds/Space Background_8.png",
+                                 9: "Space_Backgrounds/Space Background_9.png",
+                                 10: "Space_Backgrounds/Space Background_10.png"}
+
+        self.background = pygame.image.load(self.backgrounds_dict[randint(6, 10)]).convert()
+        self.background_rect = self.background.get_rect(topleft=(0, 0))
+
+        # menu text
+        self.font = pygame.font.Font("Game_font/LLPIXEL3.ttf", 50)
+        self.game_over_text = self.font.render("Game Over", False, (255, 255, 255))
+        self.game_over_text_rect = self.game_over_text.get_rect(center=(400, 300))
+
+        # play button
+        button1 = pygame.transform.rotozoom(pygame.image.load("UI_assets/[6] Silver/[1] Normal.png").convert_alpha(), 0, 4)
+        button2 = pygame.transform.rotozoom(pygame.image.load("UI_assets/[6] Silver/[2] Clicked.png").convert_alpha(), 0, 4)
+        button3 = pygame.transform.rotozoom(pygame.image.load("UI_assets/[6] Silver/[3] Hover.png").convert_alpha(), 0, 4)
+
+        self.button_list = [button1, button2, button3]
+        self.button_animation_index = 0
+        self.button = self.button_list[self.button_animation_index]
+        self.button_rect = self.button.get_rect(center=(400, 450))
+
+        self.button_text = self.font.render("RETRY", False, (255, 255, 255))
+        self.button_text_rect = self.button_text.get_rect(center=(400, 445))
+
+
+    def update(self,screen):
+        screen.blit(self.background,self.background_rect)
+        screen.blit(self.game_over_text,self.game_over_text_rect)
+
+        # button
+        self.animate_button()
+        screen.blit(self.button,self.button_rect)
+        screen.blit(self.button_text,self.button_text_rect)
+
+
+
+

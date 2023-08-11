@@ -17,7 +17,7 @@ class PowerUp(pygame.sprite.Sprite):
         elif self.image == self.power_up_dict[2]:
             self.effect = "increase player damage by x2"
         elif self.image == self.power_up_dict[3]:
-            self.effect = "increase player speed by x2"
+            self.effect = "increase player speed by +3"
 
         self.power_up_duration = 10
 
@@ -121,8 +121,8 @@ class PlayerShip(pygame.sprite.Sprite):
                 elif self.target_health < self.max_health: self.target_health = self.max_health
             case "increase player damage by x2":
                 if self.damage < self.max_damage: self.damage *= 2; self.power_up_effect_duration = duration
-            case "increase player speed by x2":
-                if self.speed < self.max_speed: self.speed += 2; self.power_up_effect_duration = duration
+            case "increase player speed by +3":
+                if self.speed < self.max_speed: self.speed += 3; self.power_up_effect_duration = duration
 
         self.power_up_effect = effect
 
@@ -142,7 +142,7 @@ class PlayerShip(pygame.sprite.Sprite):
         self.draw_navigator(screen)
         if self.in_power_up: self.power_up_effect_diminisher()
         if self.power_up_effect != None and self.power_up_effect == "increase player damage by x2" and self.in_power_up == False: self.damage = 50
-        if self.power_up_effect != None and self.power_up_effect == "increase player speed by x2" and self.in_power_up == False: self.speed = 5
+        if self.power_up_effect != None and self.power_up_effect == "increase player speed by +3" and self.in_power_up == False: self.speed = 5
         print(f"health: {self.target_health}, damage: {self.damage}, speed: {self.speed}, current_duration: {self.power_up_effect_duration}")
         self.is_died()
 
