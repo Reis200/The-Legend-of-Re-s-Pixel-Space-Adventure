@@ -129,8 +129,7 @@ class Main:
             self.power_up_sprite_group.empty()
             self.player_sprite_group.empty()
             self.player_assets_group.empty()
-            self.lvl_manager.lvl = 1
-            self.lvl_manager.progress = 0
+            self.lvl_manager = LvlManager(self.game_font)
             self.in_game = False; self.in_over_menu = True
 
 
