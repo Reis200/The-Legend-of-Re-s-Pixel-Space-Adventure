@@ -1,8 +1,14 @@
 import pygame
 from random import randint
-from math import sqrt
+import json
 
 class LvlManager:
+
+    def save_player_progress_lvl(self):
+        with open("save_file.txt","w") as save_file:
+            json.dump(self.player_progress_dict,save_file)
+
+
     def __init__(self, game_font):
         # Game images
         self.lvl_images_dict = {1: pygame.transform.rotozoom(pygame.image.load("desolate_places/Cloudy Mountains.png").convert_alpha(),0, 3),
@@ -25,6 +31,8 @@ class LvlManager:
         self.progress = 0
         self.progress_bar_width = 200
         self.progress_bar_ratio = self.lvl_length / self.progress_bar_width
+        self.total_progress = 0
+        self.max_progress = 600
 
     def randomize_enemy_spawn(self):
         match self.lvl:
@@ -36,7 +44,7 @@ class LvlManager:
             case 6: return randint(1,8)
 
     def increase_progress(self):
-        if self.progress < self.lvl_length: self.progress += 1
+        if self.progress < self.lvl_length and self.total_progress < self.max_progress: self.progress += 10; self.total_progress += 10
 
     def Lvl_bar_update(self):
         if self.lvl != self.max_lvl:
@@ -54,7 +62,7 @@ class LvlManager:
         self.is_lvl_finish = False
 
     def check_lvl_finish(self):
-        if self.progress >= self.lvl_length:
+        if self.progress >= self.lvl_length and self.total_progress < self.max_progress:
             self.is_lvl_finish = True
 
     def draw_progress_bar(self, screen):
@@ -71,10 +79,13 @@ class LvlManager:
         self.draw_progress_bar(screen)
         self.check_lvl_finish()
         if self.is_lvl_finish: self.Lvl_bar_update()
+        self.player_progress_dict = {"lvl":self.lvl,
+                                     "progress":self.total_progress,
+                                     "percentage_of_finish": int((self.total_progress / self.max_progress) * 100)}
 
 
 class StartMenu:
-    def __init__(self):
+    def __init__(self, lvl_manager):
 
         self.backgrounds_dict = {1:"Space_Backgrounds/Space Background_1.png",
                                  2:"Space_Backgrounds/Space Background_2.png",
@@ -106,16 +117,37 @@ class StartMenu:
         self.button_text = self.font.render("PLAY", False, (255,255,255))
         self.button_text_rect = self.button_text.get_rect(center = (400,445))
 
-        # menu button
-        self.menu_button_list = [button1, button2, button3]
-        self.menu_button_animation_index = 0
-        self.menu_button = self.menu_button_list[self.menu_button_animation_index]
-        self.menu_button_rect = self.menu_button.get_rect(center=(400, 550))
+        # info button
+        self.is_in_info_section = False
+        self.info_button_list = [button1, button2, button3]
+        self.info_button_animation_index = 0
+        self.info_button = self.info_button_list[self.info_button_animation_index]
+        self.info_button_rect = self.info_button.get_rect(center=(400, 550))
 
-        self.menu_button_text = self.font.render("MENU", False, (255, 255, 255))
-        self.menu_button_text_rect = self.menu_button_text.get_rect(center=(400, 545))
+        self.info_button_text = self.font.render("INFO", False, (255, 255, 255))
+        self.info_button_text_rect = self.info_button_text.get_rect(center=(400, 545))
+
+        #read progress
+        self.lvl_manager = lvl_manager
+        try:
+            with open("save_file.txt", "r") as save_file:
+                data = json.load(save_file)
+                self.best_progress_rect = pygame.Rect(100,400,data["progress"],50)
+                self.progress_percentage_text = self.font.render(f"{data['percentage_of_finish']}%", False, (252,250,249))
+
+        except:
+            self.best_progress_rect = pygame.Rect(200, 400, 0, 50)
+            self.progress_percentage_text = self.font.render(f"{0}%",False,(252,250,249))
+
+        self.best_progress_rect_border = pygame.Rect(100, 400, self.lvl_manager.max_progress, 50)
+
+        self.progress_text = self.font.render("Best progress...", False, (255, 255, 255))
+        self.progress_text_rect = self.progress_text.get_rect(center=(400, 350))
+
+        self.progress_percentage_text_rect = self.progress_percentage_text.get_rect(center = (self.best_progress_rect_border.center))
 
         # story button
+        self.is_in_story_section = False
         self.story_button_list = [button1, button2, button3]
         self.story_button_animation_index = 0
         self.story_button = self.story_button_list[self.story_button_animation_index]
@@ -124,22 +156,57 @@ class StartMenu:
         self.story_button_text = self.font.render("STORY", False, (255, 255, 255))
         self.story_button_text_rect = self.story_button_text.get_rect(center=(400, 645))
 
+        # go back button
+        self.back_button_list = [button1, button2, button3]
+        self.back_button_animation_index = 0
+        self.back_button = self.back_button_list[self.back_button_animation_index]
+        self.back_button_rect = self.back_button.get_rect(center=(400, 500))
+
+        self.back_button_text = self.font.render("BACK", False, (255, 255, 255))
+        self.back_button_text_rect = self.back_button_text.get_rect(center=(400, 495))
+
 
     def animate_play_button(self):
         self.button_animation_index += 0.1
         if self.button_animation_index >= len(self.button_list): self.button_animation_index = 0
         self.button = self.button_list[int(self.button_animation_index)]
 
-    def animate_menu_button(self):
-        self.menu_button_animation_index += 0.1
-        if self.menu_button_animation_index >= len(self.menu_button_list): self.menu_button_animation_index = 0
-        self.menu_button = self.menu_button_list[int(self.menu_button_animation_index)]
+    def animate_info_button(self):
+        self.info_button_animation_index += 0.1
+        if self.info_button_animation_index >= len(self.info_button_list): self.info_button_animation_index = 0
+        self.info_button = self.info_button_list[int(self.info_button_animation_index)]
 
     def animate_story_button(self):
         self.story_button_animation_index += 0.1
         if self.story_button_animation_index >= len(self.story_button_list): self.story_button_animation_index = 0
         self.story_button = self.story_button_list[int(self.story_button_animation_index)]
 
+    def animate_back_button(self):
+        self.back_button_animation_index += 0.1
+        if self.back_button_animation_index >= len(self.back_button_list): self.back_button_animation_index = 0
+        self.back_button = self.back_button_list[int(self.back_button_animation_index)]
+
+    def in_info_section(self,screen):
+        screen.blit(self.background,self.background_rect)
+        screen.blit(self.progress_text,self.progress_text_rect)
+        pygame.draw.rect(screen, (0,255,0), self.best_progress_rect)
+        pygame.draw.rect(screen, (255, 253, 250), self.best_progress_rect_border, 4)
+        screen.blit(self.progress_percentage_text,self.progress_percentage_text_rect)
+
+        # back button
+        self.animate_back_button()
+        self.back_button_rect.center, self.back_button_text_rect.center = ((400, 500), (400, 495))
+        screen.blit(self.back_button, self.back_button_rect)
+        screen.blit(self.back_button_text, self.back_button_text_rect)
+
+    def in_story_section(self,screen):
+        screen.blit(self.background,self.background_rect)
+
+        # back button
+        self.animate_back_button()
+        self.back_button_rect.center, self.back_button_text_rect.center = ((400, 800), (400, 795))
+        screen.blit(self.back_button, self.back_button_rect)
+        screen.blit(self.back_button_text, self.back_button_text_rect)
 
 
     def update(self,screen):
@@ -152,10 +219,10 @@ class StartMenu:
         screen.blit(self.button,self.button_rect)
         screen.blit(self.button_text,self.button_text_rect)
 
-        # menu button
-        self.animate_menu_button()
-        screen.blit(self.menu_button, self.menu_button_rect)
-        screen.blit(self.menu_button_text, self.menu_button_text_rect)
+        # info button
+        self.animate_info_button()
+        screen.blit(self.info_button, self.info_button_rect)
+        screen.blit(self.info_button_text, self.info_button_text_rect)
 
         # menu button
         self.animate_story_button()
@@ -193,15 +260,33 @@ class OverMenu(StartMenu):
         self.button_text = self.font.render("RETRY", False, (255, 255, 255))
         self.button_text_rect = self.button_text.get_rect(center=(400, 445))
 
+        # main menu button
+        self.main_button_list = [button1, button2, button3]
+        self.main_button_animation_index = 0
+        self.main_button = self.main_button_list[self.main_button_animation_index]
+        self.main_button_rect = self.main_button.get_rect(center=(400, 550))
+
+        self.main_button_text = self.font.render("MAIN", False, (255, 255, 255))
+        self.main_button_text_rect = self.main_button_text.get_rect(center=(400, 545))
+
+    def animate_main_button(self):
+        self.main_button_animation_index += 0.1
+        if self.main_button_animation_index >= len(self.main_button_list): self.main_button_animation_index = 0
+        self.main_button = self.main_button_list[int(self.main_button_animation_index)]
 
     def update(self,screen):
         screen.blit(self.background,self.background_rect)
         screen.blit(self.game_over_text,self.game_over_text_rect)
 
         # button
-        self.animate_button()
+        self.animate_play_button()
         screen.blit(self.button,self.button_rect)
         screen.blit(self.button_text,self.button_text_rect)
+
+        # main button
+        self.animate_main_button()
+        screen.blit(self.main_button, self.main_button_rect)
+        screen.blit(self.main_button_text, self.main_button_text_rect)
 
 
 

@@ -1,8 +1,10 @@
 import pygame
+import json
 from sys import exit
 from game_sprites import *
 from game_managers import *
 from random import choice,randint
+
 
 
 class Main:
@@ -32,7 +34,7 @@ class Main:
 
         # Objects
         self.lvl_manager = LvlManager(self.game_font)
-        self.start_menu_manager = StartMenu()
+        self.start_menu_manager = StartMenu(self.lvl_manager)
         self.over_menu_manager = OverMenu()
 
         # Sprite Groups - Player
@@ -63,7 +65,12 @@ class Main:
 
 
     def in_start_menu_operation(self):
-        self.start_menu_manager.update(self.screen)
+        if self.start_menu_manager.is_in_info_section:
+            self.start_menu_manager.in_info_section(self.screen)
+        elif self.start_menu_manager.is_in_story_section:
+            self.start_menu_manager.in_story_section(self.screen)
+        else:
+            self.start_menu_manager.update(self.screen)
 
     def in_over_menu_operation(self):
         self.over_menu_manager.update(self.screen)
@@ -129,7 +136,16 @@ class Main:
             self.power_up_sprite_group.empty()
             self.player_sprite_group.empty()
             self.player_assets_group.empty()
+            try:
+                with open("save_file.txt", "r") as save_file:
+                    json.load(self.player_data, save_file)
+                    if data["progress"] >= self.lvl_manager.total_progress: pass
+                    else: self.lvl_manager.save_player_progress_lvl()
+            except: self.lvl_manager.save_player_progress_lvl()
+
             self.lvl_manager = LvlManager(self.game_font)
+            self.start_menu_manager = StartMenu(self.lvl_manager)
+            self.over_menu_manager = OverMenu()
             self.in_game = False; self.in_over_menu = True
 
 
@@ -138,20 +154,43 @@ class Main:
         while True:
 
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+                if event.type == pygame.QUIT and not self.in_game:
                     pygame.quit()
                     exit()
+                if event.type == pygame.QUIT and self.in_game:
+                    try:
+                        with open("save_file.txt", "r") as save_file:
+                            json.load(self.player_data,save_file)
+                            if data["progress"] >= self.lvl_manager.total_progress: pass
+                            else: self.lvl_manager.save_player_progress_lvl()
+                    except:
+                        self.lvl_manager.save_player_progress_lvl()
+
+                    pygame.quit()
+                    exit()
+
 
                 if event.type == pygame.MOUSEBUTTONDOWN and self.in_start_menu:
                     if self.start_menu_manager.button_rect.collidepoint(event.pos):
                         self.in_start_menu = False; self.in_game = True
+                    elif self.start_menu_manager.info_button_rect.collidepoint(event.pos):
+                        self.start_menu_manager.is_in_info_section = True
+                    elif self.start_menu_manager.story_button_rect.collidepoint(event.pos):
+                        self.start_menu_manager.is_in_story_section = True
+                    elif self.start_menu_manager.back_button_rect.collidepoint(event.pos):
+                        self.start_menu_manager.is_in_info_section = False
+                        self.start_menu_manager.is_in_story_section = False
+
 
                 if event.type == pygame.MOUSEBUTTONDOWN and self.in_over_menu:
                     if self.over_menu_manager.button_rect.collidepoint(event.pos):
                         self.in_over_menu = False
                         self.in_game = True
                         self.player_sprite_group.add(PlayerShip())
-                        print("")
+                    elif self.over_menu_manager.main_button_rect.collidepoint(event.pos):
+                        self.in_over_menu = False
+                        self.in_start_menu = True
+                        self.player_sprite_group.add(PlayerShip())
 
 
 
@@ -168,7 +207,7 @@ class Main:
                         self.player_sprite_group.sprite.increase_health(20)
 
                     if event.key == pygame.K_h:
-                        self.lvl_manager.progress += 10
+                        self.lvl_manager.increase_progress()
 
 
                 if event.type == self.enemy_spawn_timer and self.in_game:
