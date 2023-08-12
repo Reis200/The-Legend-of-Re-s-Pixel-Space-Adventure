@@ -57,9 +57,9 @@ class LvlManager:
 
         match self.lvl:
             case 2: self.enemy_spawn_count_per_timer += 1;self.lvl_length = 70; self.progress = 0; self.progress_bar_ratio = self.lvl_length / self.progress_bar_width
-            case 3: self.enemy_spawn_count_per_timer += 1;self.lvl_length = 90; self.progress = 0; self.progress_bar_ratio = self.lvl_length / self.progress_bar_width
+            case 3: self.lvl_length = 90; self.progress = 0; self.progress_bar_ratio = self.lvl_length / self.progress_bar_width
             case 4: self.enemy_spawn_count_per_timer += 1;self.lvl_length = 110; self.progress = 0; self.progress_bar_ratio = self.lvl_length / self.progress_bar_width
-            case 5: self.enemy_spawn_count_per_timer += 1;self.lvl_length = 130; self.progress = 0; self.progress_bar_ratio = self.lvl_length / self.progress_bar_width
+            case 5: self.lvl_length = 130; self.progress = 0; self.progress_bar_ratio = self.lvl_length / self.progress_bar_width
             case 6: self.enemy_spawn_count_per_timer += 1;self.lvl_length = 150; self.progress = 0; self.progress_bar_ratio = self.lvl_length / self.progress_bar_width
 
         self.is_lvl_finish = False

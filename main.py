@@ -243,6 +243,7 @@ class Main:
 
                 if event.type == self.enemy_spawn_timer and self.in_game:
                     for enemy_spawn_count in range(self.lvl_manager.enemy_spawn_count_per_timer):
+                        print(self.lvl_manager.enemy_spawn_count_per_timer)
                         self.enemy_sprite_group.add(EnemyShip(self.lvl_manager.randomize_enemy_spawn()))
                     # self.enemy_sprite_group.add(EnemyShip(7))
 

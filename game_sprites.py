@@ -143,7 +143,7 @@ class PlayerShip(pygame.sprite.Sprite):
         if self.in_power_up: self.power_up_effect_diminisher()
         if self.power_up_effect != None and self.power_up_effect == "increase player damage by x2" and self.in_power_up == False: self.damage = 50; self.bullet_lvl = 0
         if self.power_up_effect != None and self.power_up_effect == "increase player speed by +3" and self.in_power_up == False: self.speed = 5
-        print(f"health: {self.target_health}, damage: {self.damage}, speed: {self.speed}, current_duration: {self.power_up_effect_duration}")
+        # print(f"health: {self.target_health}, damage: {self.damage}, speed: {self.speed}, current_duration: {self.power_up_effect_duration}")
         self.is_died()
 
 
