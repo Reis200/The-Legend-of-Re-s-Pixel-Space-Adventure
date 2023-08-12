@@ -143,7 +143,7 @@ class Main:
             self.player_assets_group.empty()
             try:
                 with open("save_file.txt", "r") as save_file:
-                    json.load(self.player_data, save_file)
+                    data = json.load(save_file)
                     if data["progress"] >= self.lvl_manager.total_progress: pass
                     else: self.lvl_manager.save_player_progress_lvl()
             except: self.lvl_manager.save_player_progress_lvl()
@@ -162,7 +162,7 @@ class Main:
 
             try:
                 with open("save_file.txt", "r") as save_file:
-                    json.load(self.player_data, save_file)
+                    data = json.load(save_file)
                     if data["progress"] >= self.lvl_manager.total_progress: pass
                     else: self.lvl_manager.save_player_progress_lvl()
             except: self.lvl_manager.save_player_progress_lvl()
@@ -185,7 +185,7 @@ class Main:
                 if event.type == pygame.QUIT and self.in_game:
                     try:
                         with open("save_file.txt", "r") as save_file:
-                            json.load(self.player_data,save_file)
+                            data = json.load(save_file)
                             if data["progress"] >= self.lvl_manager.total_progress: pass
                             else: self.lvl_manager.save_player_progress_lvl()
                     except:
