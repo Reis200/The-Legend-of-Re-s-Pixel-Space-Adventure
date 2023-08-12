@@ -34,6 +34,9 @@ class LvlManager:
         self.total_progress = 0
         self.max_progress = 600
 
+        # updates every game
+        self.game_finished = False
+
     def randomize_enemy_spawn(self):
         match self.lvl:
             case 1: return randint(1,3)
@@ -64,6 +67,11 @@ class LvlManager:
     def check_lvl_finish(self):
         if self.progress >= self.lvl_length and self.total_progress < self.max_progress:
             self.is_lvl_finish = True
+
+    def return_game_finish(self):
+        if self.total_progress >= self.max_progress:
+            self.game_finished = True
+        return self.game_finished
 
     def draw_progress_bar(self, screen):
         screen.blit(self.lvl_text,self.lvl_text_rect)
@@ -146,7 +154,25 @@ class StartMenu:
 
         self.progress_percentage_text_rect = self.progress_percentage_text.get_rect(center = (self.best_progress_rect_border.center))
 
-        # story button
+        # story
+        self.story_font = pygame.font.Font("Game_font/LLPIXEL3.ttf", 30)
+        self.story_text_1 = self.story_font.render("Once upon a time, in a distant land...",False, (255, 255, 255))
+        self.story_text_2 = self.story_font.render("There was a courages warrior named ReIs", False, (255, 255, 255))
+        self.story_text_3 = self.story_font.render("He was in search for a new planet: a new home", False, (255, 255, 255))
+        self.story_text_4 = self.story_font.render("In order to get more muscular", False, (255, 255, 255))
+        self.story_text_5 = self.story_font.render("and realise his purpose in life", False, (255, 255, 255))
+        self.story_text_6 = self.story_font.render("This was not a simple quest after all...", False, (255, 255, 255))
+        self.story_text_7 = self.story_font.render("But our warrior was ready to what it takes...", False, (255, 255, 255))
+
+        self.story_dict = {self.story_text_1:self.story_text_1.get_rect(center = (400,200)),
+                                self.story_text_2:self.story_text_2.get_rect(center = (400,270)),
+                                self.story_text_3:self.story_text_3.get_rect(center = (400,340)),
+                                self.story_text_4:self.story_text_4.get_rect(center = (400,410)),
+                                self.story_text_5: self.story_text_5.get_rect(center = (400,450)),
+                                self.story_text_6:self.story_text_6.get_rect(center = (400,550)),
+                                self.story_text_7:self.story_text_7.get_rect(center = (400,620))}
+
+        # button
         self.is_in_story_section = False
         self.story_button_list = [button1, button2, button3]
         self.story_button_animation_index = 0
@@ -202,6 +228,10 @@ class StartMenu:
     def in_story_section(self,screen):
         screen.blit(self.background,self.background_rect)
 
+        #story
+        for text in self.story_dict:
+            rect = self.story_dict[text]
+            screen.blit(text,rect)
         # back button
         self.animate_back_button()
         self.back_button_rect.center, self.back_button_text_rect.center = ((400, 800), (400, 795))
@@ -228,6 +258,130 @@ class StartMenu:
         self.animate_story_button()
         screen.blit(self.story_button, self.story_button_rect)
         screen.blit(self.story_button_text, self.story_button_text_rect)
+
+
+class GameEndMenu:
+    def __init__(self):
+        self.backgrounds_dict = {1: "Space_Backgrounds/Space Background_11.png",
+                                 2: "Space_Backgrounds/Space Background_12.png",
+                                 3: "Space_Backgrounds/Space Background_13.png",
+                                 4: "Space_Backgrounds/Space Background_14.png",
+                                 5: "Space_Backgrounds/Space Background_15.png"}
+
+        self.background = pygame.image.load(self.backgrounds_dict[randint(1, 5)]).convert()
+        self.background_rect = self.background.get_rect(topleft=(0, 0))
+
+        self.planet_backgrounds_dict = {1:pygame.image.load("Planet/tile000.png").convert_alpha(),
+                                        2:pygame.image.load("Planet/tile001.png").convert_alpha(),
+                                        3:pygame.image.load("Planet/tile002.png").convert_alpha(),
+                                        4:pygame.image.load("Planet/tile003.png").convert_alpha(),
+                                        5:pygame.image.load("Planet/tile004.png").convert_alpha(),
+                                        6:pygame.image.load("Planet/tile005.png").convert_alpha(),
+                                        7:pygame.image.load("Planet/tile006.png").convert_alpha(),
+                                        8:pygame.image.load("Planet/tile007.png").convert_alpha(),
+                                        9:pygame.image.load("Planet/tile008.png").convert_alpha(),
+                                        10:pygame.image.load("Planet/tile009.png").convert_alpha(),
+                                        11:pygame.image.load("Planet/tile010.png").convert_alpha(),
+                                        12:pygame.image.load("Planet/tile011.png").convert_alpha(),
+                                        13:pygame.image.load("Planet/tile012.png").convert_alpha(),
+                                        14:pygame.image.load("Planet/tile013.png").convert_alpha(),
+                                        15:pygame.image.load("Planet/tile014.png").convert_alpha(),
+                                        16:pygame.image.load("Planet/tile015.png").convert_alpha(),
+                                        17:pygame.image.load("Planet/tile016.png").convert_alpha(),
+                                        18:pygame.image.load("Planet/tile017.png").convert_alpha(),
+                                        19:pygame.image.load("Planet/tile018.png").convert_alpha(),
+                                        20:pygame.image.load("Planet/tile019.png").convert_alpha(),
+                                        21:pygame.image.load("Planet/tile020.png").convert_alpha(),
+                                        22:pygame.image.load("Planet/tile021.png").convert_alpha(),
+                                        23:pygame.image.load("Planet/tile022.png").convert_alpha(),
+                                        24:pygame.image.load("Planet/tile023.png").convert_alpha(),
+                                        25:pygame.image.load("Planet/tile024.png").convert_alpha(),
+                                        26:pygame.image.load("Planet/tile025.png").convert_alpha(),
+                                        27:pygame.image.load("Planet/tile026.png").convert_alpha(),
+                                        28:pygame.image.load("Planet/tile027.png").convert_alpha(),
+                                        29:pygame.image.load("Planet/tile028.png").convert_alpha(),
+                                        30:pygame.image.load("Planet/tile029.png").convert_alpha(),
+                                        31:pygame.image.load("Planet/tile030.png").convert_alpha(),
+                                        32:pygame.image.load("Planet/tile031.png").convert_alpha(),
+                                        33:pygame.image.load("Planet/tile032.png").convert_alpha(),
+                                        34:pygame.image.load("Planet/tile033.png").convert_alpha(),
+                                        35:pygame.image.load("Planet/tile034.png").convert_alpha(),
+                                        36:pygame.image.load("Planet/tile035.png").convert_alpha(),
+                                        37:pygame.image.load("Planet/tile036.png").convert_alpha(),
+                                        38:pygame.image.load("Planet/tile037.png").convert_alpha(),
+                                        39:pygame.image.load("Planet/tile038.png").convert_alpha(),
+                                        40:pygame.image.load("Planet/tile039.png").convert_alpha(),
+                                        41:pygame.image.load("Planet/tile040.png").convert_alpha(),
+                                        42:pygame.image.load("Planet/tile041.png").convert_alpha(),
+                                        43:pygame.image.load("Planet/tile042.png").convert_alpha(),
+                                        44:pygame.image.load("Planet/tile043.png").convert_alpha(),
+                                        45:pygame.image.load("Planet/tile044.png").convert_alpha(),
+                                        46:pygame.image.load("Planet/tile045.png").convert_alpha(),
+                                        47:pygame.image.load("Planet/tile046.png").convert_alpha(),
+                                        48:pygame.image.load("Planet/tile047.png").convert_alpha(),
+                                        49:pygame.image.load("Planet/tile048.png").convert_alpha(),
+                                        50:pygame.image.load("Planet/tile049.png").convert_alpha()}
+        self.planet_backgrounds_index = 1
+        self.planet_background = pygame.transform.rotozoom(self.planet_backgrounds_dict[self.planet_backgrounds_index],0,2)
+        self.planet_background_rect = self.planet_background.get_rect(center = (400,750))
+
+        # end story
+        self.story_font = pygame.font.Font("Game_font/LLPIXEL3.ttf", 30)
+        self.story_text_1 = self.story_font.render("Our warrior has successfully defeated the alien horde", False,(255, 255, 255))
+        self.story_text_2 = self.story_font.render("ReIs: I think I should settle on this planet...", False, (255, 255, 255))
+        self.story_text_3 = self.story_font.render("So the epic adventure of ReIs awaits him...", False,(255, 255, 255))
+        self.story_text_4 = self.story_font.render("In this mysterious planet...", False, (255, 255, 255))
+        self.story_text_5 = self.story_font.render("To Be Continued...", False, (255, 255, 255))
+        self.story_text_6 = self.story_font.render("The Legend of ReIs Chapter-1", False, (255, 255, 255))
+        self.story_text_7 = self.story_font.render("by Reis200", False, (255, 255, 255))
+
+        self.story_dict = {self.story_text_1: self.story_text_1.get_rect(center=(400, 200)),
+                           self.story_text_2: self.story_text_2.get_rect(center=(400, 270)),
+                           self.story_text_3: self.story_text_3.get_rect(center=(400, 340)),
+                           self.story_text_4: self.story_text_4.get_rect(center=(400, 410)),
+                           self.story_text_5: self.story_text_5.get_rect(center=(400, 450)),
+                           self.story_text_6: self.story_text_6.get_rect(center=(400, 550)),
+                           self.story_text_7: self.story_text_7.get_rect(center=(400, 620))}
+
+        # main menu button
+        button1 = pygame.transform.rotozoom(pygame.image.load("UI_assets/[6] Silver/[1] Normal.png").convert_alpha(), 0, 4)
+        button2 = pygame.transform.rotozoom(pygame.image.load("UI_assets/[6] Silver/[2] Clicked.png").convert_alpha(), 0, 4)
+        button3 = pygame.transform.rotozoom(pygame.image.load("UI_assets/[6] Silver/[3] Hover.png").convert_alpha(), 0,4)
+        self.font = pygame.font.Font("Game_font/LLPIXEL3.ttf",50)
+        self.main_button_list = [button1, button2, button3]
+        self.main_button_animation_index = 0
+        self.main_button = self.main_button_list[self.main_button_animation_index]
+        self.main_button_rect = self.main_button.get_rect(center=(400, 950))
+
+        self.main_button_text = self.font.render("MAIN", False, (255, 255, 255))
+        self.main_button_text_rect = self.main_button_text.get_rect(center=(400, 945))
+
+    def animate_main_button(self):
+        self.main_button_animation_index += 0.1
+        if self.main_button_animation_index >= len(self.main_button_list): self.main_button_animation_index = 0
+        self.main_button = self.main_button_list[int(self.main_button_animation_index)]
+
+    def animate_planet(self):
+        self.planet_backgrounds_index += 0.1
+        if self.planet_backgrounds_index >= len(self.planet_backgrounds_dict): self.planet_backgrounds_index = 1
+        self.planet_background = pygame.transform.rotozoom(self.planet_backgrounds_dict[int(self.planet_backgrounds_index)],0,2)
+
+    def update(self,screen):
+        screen.blit(self.background,self.background_rect)
+
+        # story
+        for text in self.story_dict:
+            rect = self.story_dict[text]
+            screen.blit(text, rect)
+        # animate planet
+        self.animate_planet()
+        screen.blit(self.planet_background,self.planet_background_rect)
+
+        # main button
+        self.animate_main_button()
+        screen.blit(self.main_button, self.main_button_rect)
+        screen.blit(self.main_button_text, self.main_button_text_rect)
+
 
 
 class OverMenu(StartMenu):
@@ -268,6 +422,7 @@ class OverMenu(StartMenu):
 
         self.main_button_text = self.font.render("MAIN", False, (255, 255, 255))
         self.main_button_text_rect = self.main_button_text.get_rect(center=(400, 545))
+
 
     def animate_main_button(self):
         self.main_button_animation_index += 0.1

@@ -28,6 +28,7 @@ class Main:
         self.in_start_menu = True
         self.in_game = False
         self.in_over_menu = False
+        self.in_game_finish_menu = False
 
         # clock
         self.clock = pygame.time.Clock()
@@ -36,6 +37,7 @@ class Main:
         self.lvl_manager = LvlManager(self.game_font)
         self.start_menu_manager = StartMenu(self.lvl_manager)
         self.over_menu_manager = OverMenu()
+        self.game_finish_menu_manager = GameEndMenu()
 
         # Sprite Groups - Player
         self.player_sprite_group = pygame.sprite.GroupSingle()
@@ -74,6 +76,9 @@ class Main:
 
     def in_over_menu_operation(self):
         self.over_menu_manager.update(self.screen)
+
+    def in_game_finish_operation(self):
+        self.game_finish_menu_manager.update(self.screen)
 
     def in_game_operation(self):
 
@@ -148,6 +153,26 @@ class Main:
             self.over_menu_manager = OverMenu()
             self.in_game = False; self.in_over_menu = True
 
+        if self.lvl_manager.return_game_finish():
+            self.enemy_sprite_group.empty()
+            self.enemy_assets_group.empty()
+            self.power_up_sprite_group.empty()
+            self.player_sprite_group.empty()
+            self.player_assets_group.empty()
+
+            try:
+                with open("save_file.txt", "r") as save_file:
+                    json.load(self.player_data, save_file)
+                    if data["progress"] >= self.lvl_manager.total_progress: pass
+                    else: self.lvl_manager.save_player_progress_lvl()
+            except: self.lvl_manager.save_player_progress_lvl()
+
+            self.lvl_manager = LvlManager(self.game_font)
+            self.start_menu_manager = StartMenu(self.lvl_manager)
+            self.over_menu_manager = OverMenu()
+
+            self.in_game = False; self.in_game_finish_menu = True
+
 
 
     def pygame_loop(self):
@@ -192,6 +217,12 @@ class Main:
                         self.in_start_menu = True
                         self.player_sprite_group.add(PlayerShip())
 
+                if event.type == pygame.MOUSEBUTTONDOWN and self.in_game_finish_menu:
+                    if self.game_finish_menu_manager.main_button_rect.collidepoint(event.pos):
+                        self.in_game_finish_menu = False
+                        self.in_start_menu = True
+                        self.player_sprite_group.add(PlayerShip())
+
 
 
 
@@ -227,6 +258,7 @@ class Main:
             if self.in_start_menu: self.in_start_menu_operation()
             if self.in_game: self.in_game_operation()
             if self.in_over_menu: self.in_over_menu_operation()
+            if self.in_game_finish_menu: self.in_game_finish_operation()
 
             pygame.display.update()
             self.clock.tick(60)
