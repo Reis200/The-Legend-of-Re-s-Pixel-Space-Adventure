@@ -2,6 +2,41 @@ import pygame
 from random import randint
 import json
 
+
+class MusicManager:
+    def __init__(self):
+        self.magic_space = pygame.mixer.Sound("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/magic space.mp3") #in_game music1
+        self.space_heroes = pygame.mixer.Sound("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/Space Heroes.ogg") #in_game music2
+        self.brave_pilots = pygame.mixer.Sound("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/Brave Pilots (Menu Screen).ogg") # in_start_menu
+        self.victory_tune = pygame.mixer.Sound("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/Victory Tune.ogg") #at the end
+        self.boss_theme = pygame.mixer.Sound("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/DeathMatch (Boss Theme).ogg") #last lvl
+        self.game_over_tune = pygame.mixer.Sound("The-Legend-of-Reis-Pixel-Space-Adventure-Assets/Defeated (Game Over Tune).ogg") #game_over_menu
+        self.musics = {"magic_space":self.magic_space,
+                       "space_heroes":self.space_heroes,
+                       "brave_pilots":self.brave_pilots,
+                       "victory_tune":self.victory_tune,
+                       "boss_theme": self.boss_theme,
+                       "game_over_tune": self.game_over_tune,}
+
+        self.current_music_name = ""
+
+        # magic space
+
+    def set_music(self,music_name):
+        self.current_music_name = music_name
+
+    def play_music(self, music_name):
+        if music_name == self.current_music_name:
+            self.musics[music_name].play(loops = -1)
+        else:
+            pygame.mixer.stop()
+            self.set_music(music_name)
+            self.musics[music_name].play(loops=-1)
+
+
+
+
+
 class LvlManager:
 
     def save_player_progress_lvl(self):
@@ -47,9 +82,9 @@ class LvlManager:
             case 6: return randint(1,8)
 
     def increase_progress(self):
-        if self.progress < self.lvl_length and self.total_progress < self.max_progress: self.progress += 1; self.total_progress += 1
+        if self.progress < self.lvl_length and self.total_progress < self.max_progress: self.progress += 10; self.total_progress += 10
 
-    def Lvl_bar_update(self):
+    def Lvl_bar_update(self,music_manager):
         if self.lvl != self.max_lvl:
             self.lvl += 1
 
@@ -57,10 +92,10 @@ class LvlManager:
 
         match self.lvl:
             case 2: self.enemy_spawn_count_per_timer += 1;self.lvl_length = 70; self.progress = 0; self.progress_bar_ratio = self.lvl_length / self.progress_bar_width
-            case 3: self.lvl_length = 90; self.progress = 0; self.progress_bar_ratio = self.lvl_length / self.progress_bar_width
+            case 3: self.lvl_length = 90; self.progress = 0; self.progress_bar_ratio = self.lvl_length / self.progress_bar_width; music_manager.play_music("space_heroes")
             case 4: self.enemy_spawn_count_per_timer += 1;self.lvl_length = 110; self.progress = 0; self.progress_bar_ratio = self.lvl_length / self.progress_bar_width
             case 5: self.lvl_length = 130; self.progress = 0; self.progress_bar_ratio = self.lvl_length / self.progress_bar_width
-            case 6: self.enemy_spawn_count_per_timer += 1;self.lvl_length = 150; self.progress = 0; self.progress_bar_ratio = self.lvl_length / self.progress_bar_width
+            case 6: self.enemy_spawn_count_per_timer += 1;self.lvl_length = 150; self.progress = 0; self.progress_bar_ratio = self.lvl_length / self.progress_bar_width; music_manager.play_music("boss_theme")
 
         self.is_lvl_finish = False
 
@@ -82,11 +117,11 @@ class LvlManager:
         screen.fill((28, 41, 81))
         screen.blit(self.lvl_background,(0,0))
 
-    def update(self, screen):
+    def update(self, screen, music_manager):
         self.draw_game_background(screen)
         self.draw_progress_bar(screen)
         self.check_lvl_finish()
-        if self.is_lvl_finish: self.Lvl_bar_update()
+        if self.is_lvl_finish: self.Lvl_bar_update(music_manager)
         self.player_progress_dict = {"lvl":self.lvl,
                                      "progress":self.total_progress,
                                      "percentage_of_finish": int((self.total_progress / self.max_progress) * 100)}

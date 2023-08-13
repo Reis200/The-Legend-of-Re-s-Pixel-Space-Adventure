@@ -34,6 +34,7 @@ class Main:
         self.clock = pygame.time.Clock()
 
         # Objects
+        self.music_manager = MusicManager()
         self.lvl_manager = LvlManager(self.game_font)
         self.start_menu_manager = StartMenu(self.lvl_manager)
         self.over_menu_manager = OverMenu()
@@ -53,6 +54,8 @@ class Main:
         # Sprite Group - PowerUp
         self.power_up_sprite_group = pygame.sprite.Group()
 
+        # set start menu music
+        self.music_manager.play_music("brave_pilots")
 
         # Timer
         self.enemy_spawn_timer = pygame.USEREVENT + 1
@@ -66,7 +69,9 @@ class Main:
 
 
 
+
     def in_start_menu_operation(self):
+
         if self.start_menu_manager.is_in_info_section:
             self.start_menu_manager.in_info_section(self.screen)
         elif self.start_menu_manager.is_in_story_section:
@@ -83,7 +88,7 @@ class Main:
     def in_game_operation(self):
 
         # lvl manager
-        self.lvl_manager.update(self.screen)
+        self.lvl_manager.update(self.screen, self.music_manager)
 
         # powerups draw and update
         self.power_up_sprite_group.draw(self.screen)
@@ -152,6 +157,8 @@ class Main:
             self.start_menu_manager = StartMenu(self.lvl_manager)
             self.over_menu_manager = OverMenu()
             self.in_game = False; self.in_over_menu = True
+            # start game_over music
+            self.music_manager.play_music("game_over_tune")
 
         if self.lvl_manager.return_game_finish():
             self.enemy_sprite_group.empty()
@@ -172,6 +179,8 @@ class Main:
             self.over_menu_manager = OverMenu()
 
             self.in_game = False; self.in_game_finish_menu = True
+            # set start menu music
+            self.music_manager.play_music("victory_tune")
 
 
 
@@ -198,6 +207,9 @@ class Main:
                 if event.type == pygame.MOUSEBUTTONDOWN and self.in_start_menu:
                     if self.start_menu_manager.button_rect.collidepoint(event.pos):
                         self.in_start_menu = False; self.in_game = True
+                        # start game music
+                        self.music_manager.play_music("magic_space")
+
                     elif self.start_menu_manager.info_button_rect.collidepoint(event.pos):
                         self.start_menu_manager.is_in_info_section = True
                     elif self.start_menu_manager.story_button_rect.collidepoint(event.pos):
@@ -212,16 +224,22 @@ class Main:
                         self.in_over_menu = False
                         self.in_game = True
                         self.player_sprite_group.add(PlayerShip())
+                        # start game music
+                        self.music_manager.play_music("magic_space")
                     elif self.over_menu_manager.main_button_rect.collidepoint(event.pos):
                         self.in_over_menu = False
                         self.in_start_menu = True
                         self.player_sprite_group.add(PlayerShip())
+                        # set start menu music
+                        self.music_manager.play_music("brave_pilots")
 
                 if event.type == pygame.MOUSEBUTTONDOWN and self.in_game_finish_menu:
                     if self.game_finish_menu_manager.main_button_rect.collidepoint(event.pos):
                         self.in_game_finish_menu = False
                         self.in_start_menu = True
                         self.player_sprite_group.add(PlayerShip())
+                        # set start menu music
+                        self.music_manager.play_music("brave_pilots")
 
 
 
