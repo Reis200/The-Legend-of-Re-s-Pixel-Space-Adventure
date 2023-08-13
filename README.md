@@ -2,6 +2,7 @@
 The Legend of ReꞮs: Game Series First Adventure
 
 Controls:
+
 Space bar -> player shoot
 
 Arrow keys -> player movement
