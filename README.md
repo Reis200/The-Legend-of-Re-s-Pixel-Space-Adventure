@@ -1,6 +1,10 @@
 # The-Legend-of-Reis-Pixel-Space-Adventure
 The Legend of ReꞮs: Game Series First Adventure
 
+Controls:
+Space bar -> player shoot
+Arrow keys -> player movement
+
 The files are from the following:
 https://opengameart.org/
 https://sim-kaart.itch.io/atmospheric-pixel-art-background-images-of-space-destinations
