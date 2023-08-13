@@ -248,20 +248,19 @@ class Main:
                     if event.key == pygame.K_SPACE and self.player_sprite_group.sprite != None:
                         self.player_assets_group.add(PlayerBullets(self.player_sprite_group.sprite))
 
-                    if event.key == pygame.K_e and self.player_sprite_group.sprite != None:
-                        print(self.player_sprite_group.sprite.current_health)
-                        self.player_sprite_group.sprite.decrease_health(20)
-                    if event.key == pygame.K_a and self.player_sprite_group.sprite != None:
-                        print(self.player_sprite_group.sprite.current_health)
-                        self.player_sprite_group.sprite.increase_health(20)
-
-                    if event.key == pygame.K_h:
-                        self.lvl_manager.increase_progress()
+                    # if event.key == pygame.K_e and self.player_sprite_group.sprite != None:
+                    #     print(self.player_sprite_group.sprite.current_health)
+                    #     self.player_sprite_group.sprite.decrease_health(20)
+                    # if event.key == pygame.K_a and self.player_sprite_group.sprite != None:
+                    #     print(self.player_sprite_group.sprite.current_health)
+                    #     self.player_sprite_group.sprite.increase_health(20)
+                    #
+                    # if event.key == pygame.K_h:
+                    #     self.lvl_manager.increase_progress()
 
 
                 if event.type == self.enemy_spawn_timer and self.in_game:
                     for enemy_spawn_count in range(self.lvl_manager.enemy_spawn_count_per_timer):
-                        print(self.lvl_manager.enemy_spawn_count_per_timer)
                         self.enemy_sprite_group.add(EnemyShip(self.lvl_manager.randomize_enemy_spawn()))
                     # self.enemy_sprite_group.add(EnemyShip(7))
 

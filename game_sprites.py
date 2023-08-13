@@ -13,7 +13,7 @@ class PowerUp(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center = (randint(30,770),randint(-300,-50)))
 
         if self.image == self.power_up_dict[1]:
-            self.effect = "increase health by 100"
+            self.effect = "increase health by 200"
         elif self.image == self.power_up_dict[2]:
             self.effect = "increase player damage by x2"
         elif self.image == self.power_up_dict[3]:
@@ -116,8 +116,8 @@ class PlayerShip(pygame.sprite.Sprite):
         self.in_power_up = True
 
         match effect:
-            case "increase health by 100":
-                if self.target_health <= self.max_health - 100: self.target_health += 100
+            case "increase health by 200":
+                if self.target_health <= self.max_health - 200: self.target_health += 200
                 elif self.target_health < self.max_health: self.target_health = self.max_health
             case "increase player damage by x2":
                 if self.damage < self.max_damage: self.damage *= 2; self.power_up_effect_duration = duration; self.bullet_lvl = 1

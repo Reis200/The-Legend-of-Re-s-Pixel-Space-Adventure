@@ -82,7 +82,7 @@ class LvlManager:
             case 6: return randint(1,8)
 
     def increase_progress(self):
-        if self.progress < self.lvl_length and self.total_progress < self.max_progress: self.progress += 10; self.total_progress += 10
+        if self.progress < self.lvl_length and self.total_progress < self.max_progress: self.progress += 1; self.total_progress += 1
 
     def Lvl_bar_update(self,music_manager):
         if self.lvl != self.max_lvl:
